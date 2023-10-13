@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "UserInterface.h"
 #include "GlobalVariables.h"
 #include "ProcessionFile.h"
@@ -159,18 +160,27 @@ void Menu() {
 	dsNV dsnv;
 	ReadNVFile(dsnv);
 	int pick;
+	int choice = 0;
 	bool quit = false;
 
 	while (!quit) {
-		pick = scrollMenu();
+		if (choice == 0)
+			pick = scrollMenu();
 
 		switch (pick) {
 		case 1:
 			system("color 0E");
 			break;
-		case 2:
+		case 2: 
 			system("color 0E");
-			MenuManageNV(dsnv);
+			choice = PrintOrUpdateNV();
+			if (choice == 1) {
+				MenuManageNV(dsnv);
+			}
+			else if (choice == 2) {
+				PrintListNV(dsnv);
+			}
+			choice = 0;
 			break;
 		case 3:
 			system("color 0E");
@@ -387,7 +397,7 @@ void DeleteNotification() {
 }
 
 //----------- Ve bang show thong tin ------------
-void Display(string ct[], int sl) {
+void Display(string ct[], int sl, bool used) {
 	//show key - the hien ra noi dung cua cac cot
 	for (int i = 0; i < sl; i++) {
 		gotoxy(xKeyContent[i] + 3, Y_Display);
@@ -418,14 +428,16 @@ void Display(string ct[], int sl) {
 	}
 
 	//nut huong dan
-	gotoxy(X_Instruction, Y_Instruction);
-	cout << "Nhung phim chuc nang:";
-	gotoxy(X_Instruction, Y_Instruction + 2);
-	cout << "PAGE UP: Len || PAGE DOWN: Xuong";
-	gotoxy(X_Instruction, Y_Instruction + 4);
-	cout << "INSERT: Them thong tin || DELETE: Xoa thong tin";
-	gotoxy(X_Instruction, Y_Instruction + 6);
-	cout << "HOME: Chinh sua thong tin || ESC: Thoat bang tinh";
+	if (used) {
+		gotoxy(X_Instruction, Y_Instruction);
+		cout << "Nhung phim chuc nang:";
+		gotoxy(X_Instruction, Y_Instruction + 2);
+		cout << "PAGE UP: Len || PAGE DOWN: Xuong";
+		gotoxy(X_Instruction, Y_Instruction + 4);
+		cout << "INSERT: Them thong tin || DELETE: Xoa thong tin";
+		gotoxy(X_Instruction, Y_Instruction + 6);
+		cout << "HOME: Chinh sua thong tin || ESC: Thoat bang tinh";
+	}
 }
 
 //-------- xoa nhung item vuot qua so luong xuat hien tren 1 bang --------
@@ -460,5 +472,91 @@ void CreateInputForm(string ct[], int sl, int length) {
 		cout << char(219);
 		gotoxy(X_InputForm - 2 + length, iy);
 		cout << char(219);
+	}
+}
+
+//------------ ve vien cho lua chon chuc nang nhan vien ----------
+void DrawBorderFuncNV(int x, int y, int length, int height) {
+	for (int ix = x; ix <= x + length; ix++) {
+		gotoxy(ix, y);
+		cout << char(205);
+
+		gotoxy(ix, y + height);
+		cout << char(205);
+	}
+
+	for (int iy = y; iy <= y + height; iy++) {
+		gotoxy(x, iy);
+		cout << char(186);
+
+		gotoxy(x + length, iy);
+		cout << char(186);
+	}
+	gotoxy(x, y);
+	cout << char(201);
+	gotoxy(x, y + height);
+	cout << char(200);
+	gotoxy(x + length, y);
+	cout << char(187);
+	gotoxy(x + length, y + height);
+	cout << char(188);
+}
+
+//------- ve bang lua chon in hay update nhan vien --------
+int PrintOrUpdateNV() {
+	NormalLine();
+	for (int i = 15; i <= 48; i++) {
+		gotoxy(X_display + 2, i);
+		cout << left << setw(45) << " ";
+	}
+	string ListChoiceNV[2] = {"Cap nhat nhan vien",  "In danh sach nhan vien"};
+	int RowListChoiceNV[2] = {25, 39};
+	DrawBorderFuncNV(30, 22, 32, 6);
+	DrawBorderFuncNV(30, 36, 32, 6);
+	for (int i = 0; i < 2; i++) {
+		gotoxy(32, RowListChoiceNV[i]);
+		cout << "2." << i + 1 << "/ " << ListChoiceNV[i];
+	}
+	int pick = 0;
+	HighlightLine();
+	gotoxy(32, RowListChoiceNV[pick]);
+	cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+	//--------kiem tra nut len xuong
+	char signal;
+	while (true) {
+		signal = _getch(); //kiem tra co nhap gi tu ban phim khong
+		if (signal == 224) {
+			signal = _getch();
+		}
+		switch (signal) {
+		case KEY_UP:
+			if (pick == 1) {
+				NormalLine();
+				gotoxy(32, RowListChoiceNV[pick]);
+				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				pick--;
+
+				HighlightLine();
+				gotoxy(32, RowListChoiceNV[pick]);
+				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+			}
+			break;
+		case KEY_DOWN:
+			if (pick == 0) {
+				NormalLine();
+				gotoxy(32, RowListChoiceNV[pick]);
+				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				pick++;
+
+				HighlightLine();
+				gotoxy(32, RowListChoiceNV[pick]);
+				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+			}
+			break;
+		case ESC:
+			return 0;
+		case ENTER:
+			return pick + 1; //luu lua chon de thuc hien chuc nang 
+		}
 	}
 }

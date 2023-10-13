@@ -52,6 +52,7 @@ void ReadNVFile(dsNV& ds) {
 		while (!filein.eof()) {
 			nhan_vien* nv = new nhan_vien;
 			getline(filein, nv->maNV);
+			if (nv->maNV == "") continue; //neu ma->nv rong nghia la ds rong
 			getline(filein, nv->ho);
 			getline(filein, nv->ten);
 			getline(filein,nv->phai);

@@ -8,7 +8,7 @@ using namespace std;
 void TypeOnlyAWord(string& result, int& step, bool& Saved, int Limit_word_lenght, int distance) {
 	int length = result.length();
 	int cnt = length;
-	gotoxy(X_Add + distance, Y_Add + step * 4);
+	gotoxy(X_Add + distance, Y_Add + step * 4); //vi tri con tro
 	cout << result;
 	int event; 
 

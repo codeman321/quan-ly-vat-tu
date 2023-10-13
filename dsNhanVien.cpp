@@ -76,19 +76,85 @@ void ChangeNVManagerPage(dsNV ds) {
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan li nhan vien ";
 
-	Display(ContentNV, sizeof(ContentNV) / sizeof(string));
+	Display(ContentNV, sizeof(ContentNV) / sizeof(string), true);
 	ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
+}
+
+//--------- in thong tin nhan vien theo thu tu ten tang dan ------------
+void ShowListNVOnePageAscending(nhan_vien* ds[], int sl, int index) {
+	gotoxy(X_DisplayNum, Y_DisplayNum);
+	cout << "So luong nhan vien: " << sl;
+	int i;
+	for (i = 0; i + index < sl && i < NumberPerPage; i++) {
+		ShowNV(ds[i + index], i);
+	}
+	RemoveExceedMember(i, 4);
+	gotoxy(X_Page, Y_Page);
+	cout << " Trang " << CurNVPage << "/" << TotalNVPage;
+}
+
+//---------- ve bang in danh sach nhan vien theo thu tu ten tang dan -------
+void DisplayAscendingNV(nhan_vien* ds[], int sl, int& CurNVPageAscending, int& TotalNVPageAscending) {
+	system("color 0E");
+	ShowCur(0);
+	system("cls");
+	CurNVPageAscending = 1;
+	TotalNVPageAscending = (int)ceil((double)sl / NumberPerPage);
+	Display(ContentNV, sizeof(ContentNV) / sizeof(string), false);
+	ShowListNVOnePageAscending(ds, sl, 0);
+	gotoxy(X_Title, Y_Title);
+	cout << " Quan ly nhan vien ";
+}
+
+//--------- in danh sach nhan vien theo thu tu ten tang dan -----
+void PrintListNV(dsNV ds) {
+	int CurNVPageAscending = 1;
+	int TotalNVPageAscending = 1;
+	nhan_vien* temp_ds[Max_NV];
+	int temp_sl = ds.n_nv;
+	for (int i = 0; i < temp_sl; i++) {
+		temp_ds[i] = new nhan_vien;
+		*temp_ds[i] = *ds.dsnv[i];
+	}
+	for (int i = 0; i < temp_sl; i++) {
+		for (int j = i + 1; j < temp_sl; j++) {
+			if (temp_ds[i]->ten > temp_ds[j]->ten) {
+				nhan_vien* t = new nhan_vien;
+				*t = *temp_ds[i];
+				temp_ds[i] = temp_ds[j];
+				temp_ds[j] = t;
+			}
+			else if (temp_ds[i]->ten == temp_ds[j]->ten) {
+				if (temp_ds[i]->ho > temp_ds[j]->ho) {
+					nhan_vien* t = new nhan_vien;
+					*t = *temp_ds[i];
+					temp_ds[i] = temp_ds[j];
+					temp_ds[j] = t;
+				}
+			}
+		}
+	}
+	DisplayAscendingNV(temp_ds, temp_sl, CurNVPageAscending, TotalNVPageAscending);
+	char c;
+	while (true) {
+		while (_kbhit()) {
+			c = _getch();
+			if (c == ESC) {
+				return;
+			}
+		}
+	}
 }
 
 //-------- nhap nhan vien ----------
 void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 	ShowCur(1);
 	bool Saved = true;//kiem tra luu lai hay chua
-	string ID = "";//ma nhan vien
-	string nv_ho = "";//ho nhan vien
-	string nv_ten = "";//ten nhan vien
-	string nv_phai = "";// phai nhan vien
-	string ho_ten = "";
+	string ID;//ma nhan vien
+	string nv_ho;//ho nhan vien
+	string nv_ten;//ten nhan vien
+	string nv_phai;// phai nhan vien
+	string ho_ten;
 	int temp = 0;
 	int step = 0;//cac buoc nhap lieu
 	int target = -1;
@@ -206,11 +272,12 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 
 //----------- Menu quan ly nhan vien ---------
 void MenuManageNV(dsNV& ds) {
+	system("color 0E");
 	ShowCur(0);
 	system("cls");
 	CurNVPage = 1;
 	TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
-	Display(ContentNV, sizeof(ContentNV) / sizeof(string));
+	Display(ContentNV, sizeof(ContentNV) / sizeof(string), true);
 	ShowListNVOnePage(ds, 0);
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan ly nhan vien ";
