@@ -75,8 +75,6 @@ void ShowListNVOnePage(dsNV ds, int index) {
 void ChangeNVManagerPage(dsNV ds) {
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan li nhan vien ";
-
-	Display(ContentNV, sizeof(ContentNV) / sizeof(string), true);
 	ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
 }
 
@@ -114,20 +112,20 @@ void PrintListNV(dsNV ds) {
 	int temp_sl = ds.n_nv;
 	for (int i = 0; i < temp_sl; i++) {
 		temp_ds[i] = new nhan_vien;
-		*temp_ds[i] = *ds.dsnv[i];
+		temp_ds[i] = ds.dsnv[i];
 	}
 	for (int i = 0; i < temp_sl; i++) {
 		for (int j = i + 1; j < temp_sl; j++) {
 			if (temp_ds[i]->ten > temp_ds[j]->ten) {
 				nhan_vien* t = new nhan_vien;
-				*t = *temp_ds[i];
+				t = temp_ds[i];
 				temp_ds[i] = temp_ds[j];
 				temp_ds[j] = t;
 			}
 			else if (temp_ds[i]->ten == temp_ds[j]->ten) {
 				if (temp_ds[i]->ho > temp_ds[j]->ho) {
 					nhan_vien* t = new nhan_vien;
-					*t = *temp_ds[i];
+					t = temp_ds[i];
 					temp_ds[i] = temp_ds[j];
 					temp_ds[j] = t;
 				}
@@ -140,6 +138,7 @@ void PrintListNV(dsNV ds) {
 		while (_kbhit()) {
 			c = _getch();
 			if (c == ESC) {
+				delete temp_ds;
 				return;
 			}
 		}
@@ -151,17 +150,40 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 	ShowCur(1);
 	bool Saved = true;//kiem tra luu lai hay chua
 	string ID;//ma nhan vien
+	//string ID_temp;
 	string nv_ho;//ho nhan vien
 	string nv_ten;//ten nhan vien
 	string nv_phai;// phai nhan vien
 	string ho_ten;
 	int temp = 0;
-	int step = 0;//cac buoc nhap lieu
+	int step = 1;//cac buoc nhap lieu
 	int target = -1;
+	int target2 = -1;
+	bool Edited_temp = Edited;
 
 	while (true) {
 		switch (step) {
-		case 0: //Nhap ma nhan vien
+		case 1: //Nhap ma nhan vien
+			if (Edited_temp) {
+				string ContentNV[3] = { "Ma NV", "Ho va Ten", "Phai" };
+				CreateInputForm(ContentNV, 1, 50);
+				TypeWordAndNumber(ID, step, Saved, 10, 5);
+				if (!Saved) {
+					RemoveFormComplete(3);
+					return;
+				}
+				if (FindIndexNV(ds, ID) == -1) {
+					Notification("Ma nhan vien khong ton tai!");
+					ID = "";
+					RemoveForm(1);
+					break;
+				}
+				target2 = FindIndexNV(ds, ID);
+				ID = "";
+				RemoveForm(1);
+				CreateInputForm(ContentNV, 3, 50);
+				Edited_temp = false;
+			}
 			TypeWordAndNumber(ID, step, Saved, 10, 5);
 			if (!Saved) {
 				RemoveFormComplete(3);
@@ -171,10 +193,12 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 			//kiem tra viec xoa thong tin
 			if (Deleted) {
 				if (FindIndexNV(ds, ID) == -1) {
-					Notification("ID khong ton tai!");
+					Notification("Ma nhan vien khong ton tai!");
+					ID = "";
+					RemoveForm(1);
 					break;
 				}
-				int target = RemoveConfirm();
+				target = RemoveConfirm();
 				RemoveFormComplete(1);
 				if (target == 2) {
 					return;
@@ -193,22 +217,19 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 
 			target = FindIndexNV(ds, ID);
 			if (ID == "") {
-				Notification("Vui long khong bo trong thong tin!");
+				Notification("Ma nhan vien khong duoc phep rong!");
 				break;
 			}
 			//Kiem tra trong truong hop nhap
-			if (target != -1 && !Edited) {
-				Notification("ID da ton tai!");
-				break;
-			}
-			//kiem tra trong truong hop chinh sua
-			if (target == -1 && Edited) {
-				Notification("ID khong ton tai!");
+			if (target != -1) {
+				Notification("Ma nhan vien da ton tai!");
+				ID = "";
+				RemoveForm(1);
 				break;
 			}
 			step++;
 			break;
-		case 1: //Nhap ho va ten
+		case 2: //Nhap ho va ten
 			TypeWordAndSpace(ho_ten, step, Saved, 30, 5);
 			if (ho_ten == "") {
 				Notification("Ho va ten khong duoc phep rong!");
@@ -224,7 +245,7 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 			nv_ten = ho_ten.substr(temp + 1);
 			step++;
 			break;
-		case 2: //Nhap phai
+		case 3: //Nhap phai
 			TypeOnlyAWord(nv_phai, step, Saved, 5, 5);
 			if (nv_phai == "") {
 				Notification("Gioi tinh khong duoc phep rong!");
@@ -232,12 +253,17 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 			}
 			step++;
 			break;
-		case 3: 
-			if (Edited && target != -1) {
-				ds.dsnv[target]->ho = nv_ho;
-				ds.dsnv[target]->ten = nv_ten;
-				ds.dsnv[target]->phai = nv_phai;
+		case 4: 
+			if (Edited) {
+				ds.dsnv[target2]->maNV = ID;
+				ds.dsnv[target2]->ho = nv_ho;
+				ds.dsnv[target2]->ten = nv_ten;
+				ds.dsnv[target2]->phai = nv_phai;
 				Notification("Chinh sua thanh cong!");
+				RemoveFormComplete(3);
+				TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
+				ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
+				return;
 			}
 			else { //dung insert order
 				int i;
@@ -260,7 +286,7 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 			nv_phai = "";
 			ho_ten = "";
 			temp = 0;
-			step = 0;
+			step = 1;
 			TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
 			ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
 			RemoveForm(3);
@@ -315,14 +341,13 @@ void MenuManageNV(dsNV& ds) {
 					}
 					CreateInputForm(ContentNV, 1, 50);
 					inputNV(ds, false, true);
+					ShowCur(0);
 				}
 				else if (event == HOME) {
 					if (ds.n_nv == 0) {
 						Notification("Danh sach rong, khong the chinh sua");
 						return;
 					}
-					string ContentNV[3] = { "Ma NV", "Ho va Ten", "Phai" };
-					CreateInputForm(ContentNV, 3, 50);
 					inputNV(ds, true, false);
 					ShowCur(0);
 				}

@@ -4,7 +4,8 @@
 #include "ProcessionFile.h"
 #include "dsNhanVien.h"
 
-int xKeyContent[5] = { 12, 30, 65, 100, 113 };
+int xKeyContentNV[5] = { 12, 30, 65, 100, 113 };
+int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
 
 string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
@@ -15,7 +16,8 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Thong ke doanh thu trong 1 nam",
 							   "Thoat" };
 
-string ContentNV[4] = { "Ma NV", "Ho", "Ten", "Phai" };
+string ContentNV[4] = { "Ma nhan vien", "Ho", "Ten", "Phai" };
+string ContentVT[4] = { "Ma vat tu", "Ten vat tu","don vi tinh", "so luong ton" };
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -147,6 +149,7 @@ int scrollMenu() {
 			}
 			break;
 		case ENTER:
+			NormalLine();
 			return pick + 1; //luu lua chon de thuc hien chuc nang ham Menu
 		}
 	}
@@ -400,20 +403,20 @@ void DeleteNotification() {
 void Display(string ct[], int sl, bool used) {
 	//show key - the hien ra noi dung cua cac cot
 	for (int i = 0; i < sl; i++) {
-		gotoxy(xKeyContent[i] + 3, Y_Display);
+		gotoxy(xKeyContentNV[i] + 3, Y_Display);
 		cout << ct[i];
 	}
 
 	//ve cac duong thang de phan chia cac cot
 	for (int iy = Y_Display - 2; iy <= Y_Display + 45; iy++) {
 		for (int i = 0; i < sl + 1; i++) {
-			gotoxy(xKeyContent[i], iy);
+			gotoxy(xKeyContentNV[i], iy);
 			cout << char(219);
 		}
 	}
 
 	//ve thanh ngang ben tren va duoi
-	for (int ix = xKeyContent[0]; ix <= xKeyContent[sl]; ix++) {
+	for (int ix = xKeyContentNV[0]; ix <= xKeyContentNV[sl]; ix++) {
 		//ve thanh ngang ben tren so 1
 		gotoxy(ix, Y_Display - 2);
 		cout << char(219);
@@ -440,12 +443,44 @@ void Display(string ct[], int sl, bool used) {
 	}
 }
 
+//-------- in bang thong tin (only watch) -----------
+void DisplayForWatch(string ct[], int num_row, int num_item) {
+	//show key - the hien ra noi dung cua cac cot
+	for (int i = 0; i < num_row; i++) {
+		gotoxy(xKeyContentVT[i] + 3, Y_Display);
+		cout << ct[i];
+	}
+
+	//ve cac duong thang de phan chia cac cot
+	for (int iy = Y_Display - 2; iy <= Y_Display + 45; iy++) {
+		for (int i = 0; i < num_row + 1; i++) {
+			gotoxy(xKeyContentVT[i], iy);
+			cout << char(219);
+		}
+	}
+
+	//ve thanh ngang ben tren va duoi
+	for (int ix = xKeyContentVT[0]; ix <= xKeyContentVT[num_row]; ix++) {
+		//ve thanh ngang ben tren so 1
+		gotoxy(ix, Y_Display - 2);
+		cout << char(219);
+
+		// ve thanh ngang ben tren so 2
+		gotoxy(ix, Y_Display + 2);
+		cout << char(219);
+
+		//ve thanh ngang ben duoi
+		gotoxy(ix, Y_Display + 45);
+		cout << char(219);
+	}
+}
+
 //-------- xoa nhung item vuot qua so luong xuat hien tren 1 bang --------
 void RemoveExceedMember(int cnt, int sl) {
 	if (cnt < NumberPerPage) {
 		for (int i = cnt; i < NumberPerPage; i++) {
 			for (int j = 0; j < sl; j++) {
-				for (int k = xKeyContent[j] + 3; k < xKeyContent[j + 1]; k++) {
+				for (int k = xKeyContentNV[j] + 3; k < xKeyContentNV[j + 1]; k++) {
 					gotoxy(k, Y_Display + 4 + i * 4);
 					cout << " ";
 				}
@@ -504,7 +539,7 @@ void DrawBorderFuncNV(int x, int y, int length, int height) {
 
 //------- ve bang lua chon in hay update nhan vien --------
 int PrintOrUpdateNV() {
-	NormalLine();
+	system("color 0E");
 	for (int i = 15; i <= 48; i++) {
 		gotoxy(X_display + 2, i);
 		cout << left << setw(45) << " ";
@@ -556,6 +591,7 @@ int PrintOrUpdateNV() {
 		case ESC:
 			return 0;
 		case ENTER:
+			NormalLine();
 			return pick + 1; //luu lua chon de thuc hien chuc nang 
 		}
 	}

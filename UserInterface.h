@@ -19,6 +19,7 @@ void RemoveForm(int sl);
 void Notification(string nd);
 void DeleteNotification();
 void Display(string ct[], int sl, bool used);
+void DisplayForWatch(string ct[], int sl);
 void RemoveExceedMember(int cnt, int sl);
 void CreateInputForm(string ct[], int sl, int length);
 void DrawBorderFuncNV(int x, int y, int length, int height);

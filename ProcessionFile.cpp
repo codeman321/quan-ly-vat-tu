@@ -1,9 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "mylib.h"
 #include "ProcessionFile.h"
-#include "dsNhanVien.h"
 
 using namespace std;
 
@@ -26,7 +24,8 @@ void Introduction() {
 	return;
 }
 
-void WriteNVToFile(dsNV& ds) {
+//-------- ghi file nhan vien ----------
+void WriteNVToFile(dsNV ds) {
 	ofstream fileout;
 	fileout.open("DSNV.TXT", ios_base::out);// ios_base::out la de ghi vao file
 	if (fileout.is_open()) {
@@ -41,7 +40,7 @@ void WriteNVToFile(dsNV& ds) {
 	fileout.close();
 }
 
-/*Doc ghi file nhan vien*/
+//--------- doc file nhan vien ---------
 void ReadNVFile(dsNV& ds) {
 	ifstream filein;
 	filein.open("DSNV.TXT", ios_base::in);// ios_base::in la de doc
@@ -60,6 +59,56 @@ void ReadNVFile(dsNV& ds) {
 			ds.dsnv[i++] = nv;
 			// cap nhat so luong phan tu trong mang
 			ds.n_nv++;
+		}
+	}
+	filein.close();
+}
+
+//---------- ghi file vat tu ----------
+void WriteAVt(Vt_Node root, ofstream& fileout) {
+	fileout << root->data.ma_vt << endl;
+	fileout << root->data.ten_vt << endl;
+	fileout << root->data.dvt << endl;
+	fileout << root->data.sl_ton << endl;
+}
+
+void WriteVtList(Vt_Node root, ofstream& fileout) {
+	if (root != NULL) {
+		WriteAVt(root, fileout);
+		WriteVtList(root->left, fileout);
+		WriteVtList(root->right, fileout);
+	}
+}
+
+void WriteVtToFile(Vt_Node root) {
+	ofstream fileout;
+	fileout.open("DSVT.TXT", ios_base::out);// ios_base::out la de ghi vao file
+
+	if (fileout.is_open()) {
+		WriteVtList(root, fileout);
+	}
+	else {
+
+		Notification("Ket noi file de ghi vao that bai");
+	}
+	fileout.close();
+}
+
+//-------- ghi file vat tu -----------
+void ReadVtFile(Vt_Node& root) {
+	ifstream filein;
+	filein.open("DSVT.TXT", ios_base::in);// ios_base::in la de doc
+
+	if (filein.is_open()) {
+		while (!filein.eof()) {
+			vat_tu vt;
+			getline(filein, vt.ma_vt);
+			getline(filein, vt.ten_vt);
+			getline(filein, vt.dvt);
+			filein >> vt.sl_ton;
+			filein.ignore();
+
+			root = AddVt(root, vt);
 		}
 	}
 	filein.close();

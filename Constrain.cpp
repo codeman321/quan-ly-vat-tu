@@ -8,7 +8,7 @@ using namespace std;
 void TypeOnlyAWord(string& result, int& step, bool& Saved, int Limit_word_lenght, int distance) {
 	int length = result.length();
 	int cnt = length;
-	gotoxy(X_Add + distance, Y_Add + step * 4); //vi tri con tro
+	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4); //vi tri con tro
 	cout << result;
 	int event; 
 
@@ -51,7 +51,7 @@ void TypeOnlyAWord(string& result, int& step, bool& Saved, int Limit_word_lenght
 void TypeWordAndSpace(string& result, int& step, bool& Saved, int Limit_word_lenght, int distance) {
 	int length = result.length();
 	int cnt = length;
-	gotoxy(X_Add + distance, Y_Add + step * 4);
+	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
 	cout << result;
 	int event;
 
@@ -97,7 +97,7 @@ void TypeWordAndSpace(string& result, int& step, bool& Saved, int Limit_word_len
 void TypeOnlyNumber(int& result, int& step, bool& Saved, int Limit_number, int distance) {
 	int cnt = 0;
 	int number = result;
-	gotoxy(X_Add + distance, Y_Add + step * 4);
+	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
 	cout << result;
 	int event;
 	while (number != 0) {
@@ -136,7 +136,7 @@ void TypeOnlyNumber(int& result, int& step, bool& Saved, int Limit_number, int d
 void TypeWordAndNumber(string& result, int& step, bool& Saved, int Limit_word_lenght, int distance) {
 	int length = result.length();
 	int cnt = length;
-	gotoxy(X_Add + distance, Y_Add + step * 4);
+	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
 	cout << result;
 	int event;
 
