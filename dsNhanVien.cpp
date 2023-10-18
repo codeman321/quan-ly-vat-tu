@@ -119,21 +119,18 @@ void PrintListNV(dsNV ds) {
 	nhan_vien* temp_ds[Max_NV];
 	int temp_sl = ds.n_nv;
 	for (int i = 0; i < temp_sl; i++) {
-		temp_ds[i] = new nhan_vien;
 		temp_ds[i] = ds.dsnv[i];
 	}
 	for (int i = 0; i < temp_sl; i++) {
 		for (int j = i + 1; j < temp_sl; j++) {
 			if (temp_ds[i]->ten > temp_ds[j]->ten) {
-				nhan_vien* t = new nhan_vien;
-				t = temp_ds[i];
+				nhan_vien* t = temp_ds[i];
 				temp_ds[i] = temp_ds[j];
 				temp_ds[j] = t;
 			}
 			else if (temp_ds[i]->ten == temp_ds[j]->ten) {
 				if (temp_ds[i]->ho > temp_ds[j]->ho) {
-					nhan_vien* t = new nhan_vien;
-					t = temp_ds[i];
+					nhan_vien* t = temp_ds[i];
 					temp_ds[i] = temp_ds[j];
 					temp_ds[j] = t;
 				}

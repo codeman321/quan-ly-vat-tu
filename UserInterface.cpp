@@ -168,11 +168,11 @@ void Menu() {
 	ReadNVFile(dsnv);
 
 	int pick;
-	int choice = 0;
+	int choice = -1;
 	bool quit = false;
 
 	while (!quit) {
-		if (choice == 0)
+		if (choice == -1)
 			pick = scrollMenu();
 
 		switch (pick) {
@@ -185,7 +185,7 @@ void Menu() {
 			else if (choice == 1) {
 				PrintListVT(dsvt);
 			}
-			choice = 0;
+			choice = -1;
 			break;
 		case 2: 
 			system("color 0E");
@@ -196,7 +196,7 @@ void Menu() {
 			else if (choice == 3) {
 				PrintListNV(dsnv);
 			}
-			choice = 0;
+			choice = -1;
 			break;
 		case 3:
 			system("color 0E");
@@ -557,10 +557,7 @@ int PrintOrUpdate(int index) {
 		gotoxy(X_display + 2, i);
 		cout << left << setw(45) << " ";
 	}
-	string ListChoice[4] = {"    Cap nhat vat tu", 
-							"   In danh sach vat tu", 
-							"   Cap nhat nhan vien", 
-							"   In danh sach nhan vien"};
+	string ListChoice[4] = {"Cap nhat vat tu", "In danh sach vat tu", "Cap nhat nhan vien", "In danh sach nhan vien"};
 	int RowListChoice[4] = {25, 39, 25, 39};
 	DrawBorderFuncNV(30, 22, 32, 6);
 	DrawBorderFuncNV(30, 36, 32, 6);

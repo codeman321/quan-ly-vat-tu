@@ -103,7 +103,7 @@ void ReadVtFile(Vt_Node& root) {
 		while (!filein.eof()) {
 			vat_tu vt;
 			getline(filein, vt.ma_vt);
-			if (vt.ma_vt == "") continue; //neu ma->nv rong nghia la ds rong
+			if (vt.ma_vt == "") continue; //neu ma_vt rong nghia la ds rong
 			getline(filein, vt.ten_vt);
 			getline(filein, vt.dvt);
 			filein >> vt.sl_ton;
