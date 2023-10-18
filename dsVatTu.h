@@ -34,6 +34,7 @@ Vt_Node DeleteVt(Vt_Node& root, string ID);
 void ShowVt(vat_tu vt, int pos);
 void ShowListVtOnePage(Vt_Node root, int StartIndex);
 void ChangeVtManagerPage(Vt_Node root);
+Vt_Node PickItemVt(Vt_Node root, int& pick);
 void InputVt(Vt_Node& root, bool Edited, bool Deleted);
 void MenuManageVT(Vt_Node& root);
 void ShowListVtOnePageAscending(Vt_Node ds[], int StartIndex, int sl);

@@ -27,6 +27,7 @@ void ShowListNVOnePage(dsNV ds, int index);
 void ShowListNVOnePageAscending(nhan_vien* ds[], int sl, int index);
 void ChangeNVManagerPage(dsNV ds);
 void ChangeNVManagerPageAscending(nhan_vien* ds[], int sl);
+int PickItemNv(dsNV ds);
 void inputNV(dsNV& ds, bool Edited, bool Deleted);
 void MenuManageNV(dsNV& ds);
 void DisplayAscendingNV(nhan_vien* ds[], int sl);

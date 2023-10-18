@@ -20,7 +20,7 @@ void Introduction() {
 	else {
 		cout << "\n Liet ke file that bai" << endl;
 	}
-	Sleep(1000);
+	Sleep(500);
 	return;
 }
 

@@ -17,8 +17,8 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Thong ke doanh thu trong 1 nam",
 							   "Thoat" };
 
-string ContentNV[4] = { "Ma nhan vien", "Ho", "Ten", "Phai" };
-string ContentVT[4] = { "Ma vat tu", "Ten vat tu","Don vi tinh", "SL ton" };
+string ContentNV[4] = { "Ma nhan vien", "              Ho", "             Ten", " Phai" };
+string ContentVT[4] = { "  Ma vat tu", "         Ten vat tu","        Don vi tinh", " SL ton" };
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -28,6 +28,11 @@ void NormalLine() {
 void HighlightLine() {
 	SetColor(14);// yellow 
 	SetBGColor(1);// dark blue        
+}
+
+void HighlightLine2() {
+	SetColor(12);// red
+	SetBGColor(0);// black  
 }
 
 //============= Start: Ve Menu ===========
@@ -432,14 +437,23 @@ void Display(string ct[], int sl, bool used) {
 	for (int ix = xKeyContentNV[0]; ix <= xKeyContentNV[sl]; ix++) {
 		//ve thanh ngang ben tren so 1
 		gotoxy(ix, Y_Display - 2);
-		cout << char(219);
+		cout << char(220);
 
 		// ve thanh ngang ben tren so 2
 		gotoxy(ix, Y_Display + 2);
-		cout << char(219);
+		cout << char(220);
 
 		//ve thanh ngang ben duoi
 		gotoxy(ix, Y_Display + 45);
+		cout << char(220);
+	}
+
+	//dieu chinh goc
+	for (int i = 0; i < 5; i++) {
+		gotoxy(xKeyContentNV[i], Y_Display + 2);
+		cout << char(219);
+
+		gotoxy(xKeyContentNV[i], Y_Display + 45);
 		cout << char(219);
 	}
 
@@ -609,3 +623,4 @@ int PrintOrUpdate(int index) {
 		}
 	}
 }
+

@@ -9,6 +9,7 @@ using namespace std;
 
 void NormalLine();
 void HighlightLine();
+void HighlightLine2();
 void DrawTable();
 int scrollMenu(); 
 void Menu();

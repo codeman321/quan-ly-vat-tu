@@ -160,6 +160,51 @@ void PrintListNV(dsNV ds) {
 	}
 }
 
+int PickItemNv(dsNV ds) {
+	ShowCur(0);
+
+	//--------highlight dong dang chon--------
+	int pick = 0;
+	HighlightLine2();
+	ShowNV(ds.dsnv[pick], pick);
+	//--------kiem tra nut len xuong
+	char signal;
+	while (true) {
+		signal = _getch(); //kiem tra co nhap gi tu ban phim khong
+		if (signal == -32) {
+			signal = _getch();
+		}
+		switch (signal) {
+		case KEY_UP:
+			if (pick + 1 > 1) {
+				NormalLine();
+				ShowNV(ds.dsnv[pick], pick);
+				pick--;
+
+				HighlightLine2();
+				ShowNV(ds.dsnv[pick], pick);
+			}
+			break;
+		case KEY_DOWN:
+			if (pick + 1 < ds.n_nv) {
+				NormalLine();
+				ShowNV(ds.dsnv[pick], pick);
+				pick++;
+
+				HighlightLine2();
+				ShowNV(ds.dsnv[pick], pick);
+			}
+			break;
+		case ENTER:
+			NormalLine();
+			return pick; //luu lua chon de thuc hien chuc nang ham Menu
+		case ESC:
+			NormalLine();
+			return -1;
+		}
+	}
+}
+
 //-------- nhap nhan vien ----------
 void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 	ShowCur(1);
@@ -174,51 +219,55 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 	int step = 1;//cac buoc nhap lieu
 	int target = -1;
 	int target2 = -1;
-	bool Edited_temp = Edited;
 
 	while (true) {
 		switch (step) {
 		case 1: //Nhap ma nhan vien
-			if (Edited_temp) {
+			if (Edited) {
 				string ContentNV[3] = { "Ma NV", "Ho va Ten", "Phai" };
-				CreateInputForm(ContentNV, 1, 50);
-				TypeWordAndNumber(ID, step, Saved, 10, 5);
-				if (!Saved) {
-					RemoveFormComplete(3);
+				int IndexNv = PickItemNv(ds);
+				target2 = IndexNv; //dung de luu chi so de case 4 thuc hien thao tac chinh sua
+				if (IndexNv == -1) {
+					TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
+					ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
 					return;
 				}
-				if (FindIndexNV(ds, ID) == -1) {
-					Notification("Ma nhan vien khong ton tai!");
-					ID = "";
-					RemoveForm(1);
-					break;
-				}
-				target2 = FindIndexNV(ds, ID); //dung de luu chi so de case 4 thuc hien thao tac chinh sua
-				ID = ""; //reset ma nhan vien
-				RemoveForm(1);
-				CreateInputForm(ContentNV, 3, 50);
-				Edited_temp = false;
-			}
-			TypeWordAndNumber(ID, step, Saved, 10, 5);
-			if (!Saved) {
-				RemoveFormComplete(3);
-				return;
-			}
 
+				//in ra bang nhap thong tin
+				CreateInputForm(ContentNV, 3, 50);
+
+				//gan thong tin co san cua node
+				ID = ds.dsnv[IndexNv]->maNV;
+				ho_ten = ds.dsnv[IndexNv]->ho + " " + ds.dsnv[IndexNv]->ten;
+				nv_phai = ds.dsnv[IndexNv]->phai;
+
+				//in thong tin node muon chinh sua
+				gotoxy(X_Add + 5, Y_Add);
+				cout << left << setw(15) << ID;
+				gotoxy(X_Add + 5, Y_Add + 4);
+				cout << left << setw(15) << ho_ten;
+				gotoxy(X_Add + 5, Y_Add + 8);
+				cout << left << setw(15) << nv_phai;
+				step++;
+				break;
+			}
 			//kiem tra viec xoa thong tin
 			if (Deleted) {
-				if (FindIndexNV(ds, ID) == -1) {
-					Notification("Ma nhan vien khong ton tai!");
-					ID = "";
-					RemoveForm(1);
-					break;
+				int IndexNv = PickItemNv(ds);
+				if (IndexNv == -1) {
+					TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
+					ShowListNVOnePage(ds, (CurNVPage - 1) * NumberPerPage);
+					return;
 				}
+
 				target = RemoveConfirm();
 				RemoveFormComplete(1);
 				if (target == 2) {
+					NormalLine();
+					ShowNV(ds.dsnv[IndexNv], IndexNv);
 					return;
 				}
-				if (!IsDeleteNVSuccess(ds, FindIndexNV(ds, ID))) {
+				if (!IsDeleteNVSuccess(ds, FindIndexNV(ds, ds.dsnv[IndexNv]->maNV))) {
 					Notification("Xoa khong thanh cong!");
 				}
 				else {
@@ -230,6 +279,11 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 				return;
 			}
 
+			TypeWordAndNumber(ID, step, Saved, 10, 5);
+			if (!Saved) {
+				RemoveFormComplete(3);
+				return;
+			}
 			target = FindIndexNV(ds, ID);
 			if (ID == "") {
 				Notification("Ma nhan vien khong duoc phep rong!");
@@ -354,7 +408,6 @@ void MenuManageNV(dsNV& ds) {
 						Notification("Danh sach rong, khong the xoa");
 						return;
 					}
-					CreateInputForm(ContentNV, 1, 50);
 					inputNV(ds, false, true);
 					ShowCur(0);
 				}

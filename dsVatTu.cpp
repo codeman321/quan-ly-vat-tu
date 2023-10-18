@@ -297,6 +297,53 @@ void ChangeVtManagerPage(Vt_Node root) {
 	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
 }
 
+Vt_Node PickItemVt(Vt_Node root, int& pick) {
+	ShowCur(0);
+	Vt_Node VtNodeList[Max_itemVt];
+	int index = 0;
+	UpdateArrVtList(root, VtNodeList, index);
+
+	//--------highlight dong dang chon--------
+	HighlightLine2();
+	ShowVt(VtNodeList[pick]->data, pick);
+	//--------kiem tra nut len xuong
+	char signal;
+	while (true) {
+		signal = _getch(); //kiem tra co nhap gi tu ban phim khong
+		if (signal == -32) {
+			signal = _getch();
+		}
+		switch (signal) {
+		case KEY_UP:
+			if (pick + 1 > 1) {
+				NormalLine();
+				ShowVt(VtNodeList[pick]->data, pick);
+				pick--;
+
+				HighlightLine2();
+				ShowVt(VtNodeList[pick]->data, pick);
+			}
+			break;
+		case KEY_DOWN:
+			if (pick + 1 < index) {
+				NormalLine();
+				ShowVt(VtNodeList[pick]->data, pick);
+				pick++;
+
+				HighlightLine2();
+				ShowVt(VtNodeList[pick]->data, pick);
+			}
+			break;
+		case ENTER:
+			NormalLine();
+			return VtNodeList[pick]; //luu lua chon de thuc hien chuc nang ham Menu
+		case ESC:
+			NormalLine();
+			return NULL;
+		}
+	}
+}
+
 //-------- nhap 1 vat tu ----------
 void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 	ShowCur(1);
@@ -311,51 +358,70 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 	int target = -1;
 	Vt_Node checked = NULL;
 	Vt_Node temp = NULL;
-	bool Edited_temp = Edited;
 	
 	while (true) {
 		switch (step) {
 		case 1: //nhap ma vat tu
-			if (Edited_temp) {
-				CreateInputForm(ContentVT, 1, 50);
-				TypeWordAndNumber(vt_ma, step, Saved, 10, 5);
-				if (!Saved) {
-					RemoveFormComplete(4);
+			if (Edited) {
+				string ContentVT[4] = { "Ma vat tu", "Ten vat tu", "Don vi tinh", "SL ton" };
+				int pick = 0;
+				Vt_Node EditedNode = PickItemVt(root, pick); //thuc hien tim node muon chinh sua
+
+				//truong hop an nut ESC de thoat
+				if (EditedNode == NULL) {
+					TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
+					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
 					return;
 				}
-				if (FindVtNode(root, vt_ma) == NULL) {
-					Notification("Ma nhan vien khong ton tai!");
-					vt_ma = "";
-					RemoveForm(1);
-					break;
-				}
-				temp = FindVtNode(root, vt_ma); //dung de luu node dung cho thao tac chinh sua o case 5
-				vt_ma = ""; //reset ma nhan vien
-				RemoveForm(1);
+				
+				//in ra bang nhap thong tin
 				CreateInputForm(ContentVT, 4, 50);
-				Edited_temp = false;
-			}
-			TypeWordAndNumber(vt_ma, step, Saved, 10, 5);
-			if (!Saved) {
-				RemoveFormComplete(4);
-				return;
-			}
 
+				//gan thong tin co san cua node
+				vt_ma = EditedNode->data.ma_vt;
+				vt_ten = EditedNode->data.ten_vt;
+				vt_dvt = EditedNode->data.dvt;
+				vt_slton = EditedNode->data.sl_ton;
+
+				//in thong tin node muon chinh sua
+				gotoxy(X_Add + 5, Y_Add);
+				cout << left << setw(15) << vt_ma;
+				gotoxy(X_Add + 5, Y_Add + 4);
+				cout << left << setw(15) << vt_ten;
+				gotoxy(X_Add + 5, Y_Add + 8);
+				cout << left << setw(15) << vt_dvt;
+				gotoxy(X_Add + 5, Y_Add + 12);
+				cout << left << setw(15) << vt_slton;
+
+				temp = EditedNode; //dung de luu node dung cho thao tac chinh sua o case 5
+
+				step++;
+				break;
+			}
 			//kiem tra viec xoa thong tin
 			if (Deleted) {
-				if (FindVtNode(root, vt_ma) == NULL) {
-					Notification("Ma vat tu khong ton tai!");
-					vt_ma = "";
-					RemoveForm(1);
-					break;
+				int pick = 0;
+				Vt_Node DeleteNode = PickItemVt(root, pick); //thuc hien tim node muon xoa
+
+				//truong hop an nut ESC de thoat
+				if (DeleteNode == NULL) {
+					TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
+					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+					return;
 				}
+
+				//xac thuc buoc 2
 				target = RemoveConfirm();
 				RemoveFormComplete(1);
+
+				//truong hop user chon no
 				if (target == 2) {
+					NormalLine();
+					ShowVt(DeleteNode->data, pick);
 					return;
 				}
 				else {
-					root = DeleteVt(root, vt_ma);
+					root = DeleteVt(root, DeleteNode->data.ma_vt);
 					Notification("Xoa vat tu thanh cong!");
 				}
 
@@ -365,6 +431,11 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 				return;
 			}
 
+			TypeWordAndNumber(vt_ma, step, Saved, 10, 5);
+			if (!Saved) {
+				RemoveFormComplete(4);
+				return;
+			}
 			checked = FindVtNode(root, vt_ma);
 			if (vt_ma == "") {
 				Notification("Ma vat tu khong duoc phep trong!");
@@ -396,8 +467,7 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			step++;
 			break;
 		case 4: //nhap so luong ton
-			if (checked != NULL && !Edited) {
-				Notification("Khong the nhap vi vat tu da ton tai!");
+			if (Edited) {
 				step++;
 				break;
 			}
@@ -479,6 +549,7 @@ void MenuManageVT(Vt_Node& root) {
 					ChangeVtManagerPage(root);
 				}
 				else if (event == INSERT) {//them moi vat tu
+					string ContentVT[4] = { "Ma vat tu", "Ten vat tu", "Don vi tinh", "SL ton" };
 					CreateInputForm(ContentVT, 4, 50);
 					InputVt(root);
 					ShowCur(0);
@@ -488,7 +559,6 @@ void MenuManageVT(Vt_Node& root) {
 						Notification("Danh sach rong, khong the xoa");
 						return;
 					}
-					CreateInputForm(ContentVT, 1, 50);
 					InputVt(root, false, true);
 				}
 				else if (event == HOME) {
