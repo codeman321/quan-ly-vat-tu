@@ -98,7 +98,9 @@ void TypeOnlyNumber(int& result, int& step, bool& Saved, int Limit_number, int d
 	int cnt = 0;
 	int number = result;
 	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
-	cout << result;
+	//if (result != 0) {
+	//	cout << result;
+	//}
 	int event;
 	while (number != 0) {
 		cnt++;

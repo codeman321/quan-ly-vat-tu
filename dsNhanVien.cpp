@@ -11,6 +11,8 @@ using namespace std;
 	
 int CurNVPage = 1;
 int TotalNVPage = 1;
+int CurNVPageAscending = 1;
+int TotalNVPageAscending = 1;
 extern string ContentNV[4];
 
 //----------- tim chi so cua ma nhan vien ---------
@@ -88,14 +90,22 @@ void ShowListNVOnePageAscending(nhan_vien* ds[], int sl, int index) {
 	}
 	RemoveExceedMember(i, 4);
 	gotoxy(X_Page, Y_Page);
-	cout << " Trang " << CurNVPage << "/" << TotalNVPage;
+	cout << " Trang " << CurNVPageAscending << "/" << TotalNVPageAscending;
+}
+
+//---------- thay doi trang in nhan vien tang dan ----------
+void ChangeNVManagerPageAscending(nhan_vien* ds[], int sl) {
+	gotoxy(X_Title, Y_Title);
+	cout << " Quan ly nhan vien ";
+	ShowListNVOnePageAscending(ds, sl, (CurNVPageAscending - 1) * NumberPerPage);
 }
 
 //---------- ve bang in danh sach nhan vien theo thu tu ten tang dan -------
-void DisplayAscendingNV(nhan_vien* ds[], int sl, int& CurNVPageAscending, int& TotalNVPageAscending) {
+void DisplayAscendingNV(nhan_vien* ds[], int sl) {
 	system("color 0E");
 	ShowCur(0);
 	system("cls");
+
 	CurNVPageAscending = 1;
 	TotalNVPageAscending = (int)ceil((double)sl / NumberPerPage);
 	Display(ContentNV, sizeof(ContentNV) / sizeof(string), false);
@@ -106,8 +116,6 @@ void DisplayAscendingNV(nhan_vien* ds[], int sl, int& CurNVPageAscending, int& T
 
 //--------- in danh sach nhan vien theo thu tu ten tang dan -----
 void PrintListNV(dsNV ds) {
-	int CurNVPageAscending = 1;
-	int TotalNVPageAscending = 1;
 	nhan_vien* temp_ds[Max_NV];
 	int temp_sl = ds.n_nv;
 	for (int i = 0; i < temp_sl; i++) {
@@ -132,14 +140,24 @@ void PrintListNV(dsNV ds) {
 			}
 		}
 	}
-	DisplayAscendingNV(temp_ds, temp_sl, CurNVPageAscending, TotalNVPageAscending);
-	char c;
+	DisplayAscendingNV(temp_ds, temp_sl);
+	int c;
 	while (true) {
 		while (_kbhit()) {
 			c = _getch();
 			if (c == ESC) {
-				delete temp_ds;
 				return;
+			}
+			if (c == 224) {
+				c = _getch();//lay cac ki tu dac biet
+				if (c == PAGE_UP && CurNVPageAscending > 1) {
+					CurNVPageAscending--;
+					ChangeNVManagerPageAscending(temp_ds, temp_sl);
+				}
+				else if (c == PAGE_DOWN && CurNVPageAscending < TotalNVPageAscending) {
+					CurNVPageAscending++;
+					ChangeNVManagerPageAscending(temp_ds, temp_sl);
+				}
 			}
 		}
 	}
@@ -178,8 +196,8 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 					RemoveForm(1);
 					break;
 				}
-				target2 = FindIndexNV(ds, ID);
-				ID = "";
+				target2 = FindIndexNV(ds, ID); //dung de luu chi so de case 4 thuc hien thao tac chinh sua
+				ID = ""; //reset ma nhan vien
 				RemoveForm(1);
 				CreateInputForm(ContentNV, 3, 50);
 				Edited_temp = false;
@@ -220,7 +238,7 @@ void inputNV(dsNV& ds, bool Edited = false, bool Deleted = false) {
 				Notification("Ma nhan vien khong duoc phep rong!");
 				break;
 			}
-			//Kiem tra trong truong hop nhap
+			//Kiem tra truong hop ma nhan vien da ton tai
 			if (target != -1) {
 				Notification("Ma nhan vien da ton tai!");
 				ID = "";

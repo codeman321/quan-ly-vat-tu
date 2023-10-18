@@ -3,6 +3,7 @@
 #include "GlobalVariables.h"
 #include "ProcessionFile.h"
 #include "dsNhanVien.h"
+#include "dsVatTu.h"
 
 int xKeyContentNV[5] = { 12, 30, 65, 100, 113 };
 int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
@@ -17,7 +18,7 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Thoat" };
 
 string ContentNV[4] = { "Ma nhan vien", "Ho", "Ten", "Phai" };
-string ContentVT[4] = { "Ma vat tu", "Ten vat tu","don vi tinh", "so luong ton" };
+string ContentVT[4] = { "Ma vat tu", "Ten vat tu","Don vi tinh", "SL ton" };
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -159,9 +160,13 @@ void Menu() {
 	Introduction();
 	system("cls");
 
-	/*dsvt;*/
+	Vt_Node dsvt;
+	CreateDsvt(dsvt);
+	ReadVtFile(dsvt);
+
 	dsNV dsnv;
 	ReadNVFile(dsnv);
+
 	int pick;
 	int choice = 0;
 	bool quit = false;
@@ -173,14 +178,22 @@ void Menu() {
 		switch (pick) {
 		case 1:
 			system("color 0E");
+			choice = PrintOrUpdate(0);
+			if (choice == 0) {
+				MenuManageVT(dsvt);
+			}
+			else if (choice == 1) {
+				PrintListVT(dsvt);
+			}
+			choice = 0;
 			break;
 		case 2: 
 			system("color 0E");
-			choice = PrintOrUpdateNV();
-			if (choice == 1) {
+			choice = PrintOrUpdate(2);
+			if (choice == 2) {
 				MenuManageNV(dsnv);
 			}
-			else if (choice == 2) {
+			else if (choice == 3) {
 				PrintListNV(dsnv);
 			}
 			choice = 0;
@@ -538,24 +551,27 @@ void DrawBorderFuncNV(int x, int y, int length, int height) {
 }
 
 //------- ve bang lua chon in hay update nhan vien --------
-int PrintOrUpdateNV() {
+int PrintOrUpdate(int index) {
 	system("color 0E");
 	for (int i = 15; i <= 48; i++) {
 		gotoxy(X_display + 2, i);
 		cout << left << setw(45) << " ";
 	}
-	string ListChoiceNV[2] = {"Cap nhat nhan vien",  "In danh sach nhan vien"};
-	int RowListChoiceNV[2] = {25, 39};
+	string ListChoice[4] = {"    Cap nhat vat tu", 
+							"   In danh sach vat tu", 
+							"   Cap nhat nhan vien", 
+							"   In danh sach nhan vien"};
+	int RowListChoice[4] = {25, 39, 25, 39};
 	DrawBorderFuncNV(30, 22, 32, 6);
 	DrawBorderFuncNV(30, 36, 32, 6);
-	for (int i = 0; i < 2; i++) {
-		gotoxy(32, RowListChoiceNV[i]);
-		cout << "2." << i + 1 << "/ " << ListChoiceNV[i];
+	for (int i = index; i <= index + 1; i++) {
+		gotoxy(32, RowListChoice[i]);
+		cout << ListChoice[i];
 	}
-	int pick = 0;
+	int pick = index;
 	HighlightLine();
-	gotoxy(32, RowListChoiceNV[pick]);
-	cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+	gotoxy(32, RowListChoice[pick]);
+	cout << ListChoice[pick];
 	//--------kiem tra nut len xuong
 	char signal;
 	while (true) {
@@ -565,34 +581,34 @@ int PrintOrUpdateNV() {
 		}
 		switch (signal) {
 		case KEY_UP:
-			if (pick == 1) {
+			if (pick == index + 1) {
 				NormalLine();
-				gotoxy(32, RowListChoiceNV[pick]);
-				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				gotoxy(32, RowListChoice[pick]);
+				cout << ListChoice[pick];
 				pick--;
 
 				HighlightLine();
-				gotoxy(32, RowListChoiceNV[pick]);
-				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				gotoxy(32, RowListChoice[pick]);
+				cout << ListChoice[pick];
 			}
 			break;
 		case KEY_DOWN:
-			if (pick == 0) {
+			if (pick == index) {
 				NormalLine();
-				gotoxy(32, RowListChoiceNV[pick]);
-				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				gotoxy(32, RowListChoice[pick]);
+				cout << ListChoice[pick];
 				pick++;
 
 				HighlightLine();
-				gotoxy(32, RowListChoiceNV[pick]);
-				cout << "2." << pick + 1 << "/ " << ListChoiceNV[pick];
+				gotoxy(32, RowListChoice[pick]);
+				cout << ListChoice[pick];
 			}
 			break;
 		case ESC:
 			return 0;
 		case ENTER:
 			NormalLine();
-			return pick + 1; //luu lua chon de thuc hien chuc nang 
+			return pick; //luu lua chon de thuc hien chuc nang 
 		}
 	}
 }

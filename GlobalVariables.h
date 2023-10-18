@@ -46,6 +46,9 @@
 //so luong danh sach nhan vien
 #define Max_NV 200
 
+//so luong danh sach vat tu 
+#define Max_itemVt 1000
+
 //so luong ki tu ma vat tu
 #define Max_mavt 10
 
