@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include "dsHoaDon.h"
+#include "dsVatTu.h"
 #include "GlobalVariables.h"
 
 using namespace std;
@@ -11,7 +12,8 @@ struct nhan_vien {
 	string ho;
 	string ten;
 	string phai;
-	ds_hoa_don *dshd = NULL;
+	bool used = false;
+	ds_hoa_don* dshd = new ds_hoa_don;
 };
 
 struct dsNV {
@@ -23,12 +25,17 @@ int FindIndexNV(dsNV ds, string ma);
 bool IsDeleteNVSuccess(dsNV& ds, int index);
 bool CheckInfoNVEmpty(nhan_vien* nv);
 void ShowNV(nhan_vien* nv, int pos);
-void ShowListNVOnePage(dsNV ds, int index);
-void ShowListNVOnePageAscending(nhan_vien* ds[], int sl, int index);
-void ChangeNVManagerPage(dsNV ds);
-void ChangeNVManagerPageAscending(nhan_vien* ds[], int sl);
-int PickItemNv(dsNV ds);
-void inputNV(dsNV& ds, bool Edited, bool Deleted);
+void ShowListNVOnePage(dsNV ds, int index, int CurNVPage, int TotalNVPage);
+void ShowListNVOnePageAscending(nhan_vien* ds[], int sl, int index, int CurNVPageAscending, int TotalNVPageAscending); void ChangeNVManagerPage(dsNV ds, int CurNVPage, int TotalNVPage);
+void ChangeNVManagerPageAscending(nhan_vien* ds[], int sl, int CurNVPageAscending, int TotalNVPageAscending);
+int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage);
+void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPage);
 void MenuManageNV(dsNV& ds);
-void DisplayAscendingNV(nhan_vien* ds[], int sl);
+void DisplayAscendingNV(nhan_vien* ds[], int sl, int CurNVPageAscending, int TotalNVPageAscending);
 void PrintListNV(dsNV ds);
+
+int InputHD(nhan_vien*& nv);
+int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp);
+int PickNVMakeHD(dsNV ds, int CurNVPage, int TotalNVPage);
+void DisplayMenuDSHD(nhan_vien* nv, hd_Node* temp, Vt_Node root, int CurHDPage, int TotalHDPage);
+void MenuManagerHD(dsNV& ds, Vt_Node& root);

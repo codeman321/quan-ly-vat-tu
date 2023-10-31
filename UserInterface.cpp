@@ -4,9 +4,12 @@
 #include "ProcessionFile.h"
 #include "dsNhanVien.h"
 #include "dsVatTu.h"
+#include "dsHoaDon.h"
 
 int xKeyContentNV[5] = { 12, 30, 65, 100, 113 };
 int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
+int XKeyButton[4] = { 20, 50, 140, 170 };
+int XKeyContentCTHD[6] = { 82, 102, 132, 147, 162, 177 };
 
 string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
@@ -19,6 +22,9 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 
 string ContentNV[4] = { "Ma nhan vien", "              Ho", "             Ten", " Phai" };
 string ContentVT[4] = { "  Ma vat tu", "         Ten vat tu","        Don vi tinh", " SL ton" };
+string ContentHD[4] = { "So hoa don", "Ngay lap", "Ma nhan vien", "Loai" };
+string ContentCTHD[5] = { "    Ma vat tu", "         Ten vat tu", "  So luong", "  Don gia", "   % VAT"};
+string ButtonFunc[2] = { "    Them vat tu", "  Xac Nhan & Thoat" };
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -35,13 +41,33 @@ void HighlightLine2() {
 	SetBGColor(0);// black  
 }
 
+void DrawColor(int x, int y, int w, int h, int b_color) {
+	SetBGColor(b_color);
+	for (int ix = x + 1; ix <= x + w - 1; ix++) {
+		for (int iy = y + 1; iy <= y + h - 1; iy++) {
+			gotoxy(ix, iy);
+			cout << " ";
+		}
+	}
+}
+
+void HighLightArrow(int pick) {
+	gotoxy(5, Y_Display + 4 + pick * 4);
+	cout << char(62) << char(62) << char(62) << char(62);
+}
+
+void DeleteArrow(int pick) {
+	gotoxy(5, Y_Display + 4 + pick * 4);
+	cout << "    ";
+}
+
 //============= Start: Ve Menu ===========
 void DrawTable() {
-	gotoxy(X_display + 12, Y_display + 2);
+	gotoxy(X_Menu + 12, Y_Menu + 2);
 	cout << "Pham Minh Duc - N22DCCN122";
-	gotoxy(X_display + 12, Y_display + 4);
+	gotoxy(X_Menu + 12, Y_Menu + 4);
 	cout << "Mai Hoang Long - N22DCCN049";
-	gotoxy(X_display + 78, Y_display + 3);
+	gotoxy(X_Menu + 78, Y_Menu + 3);
 	cout << "HOC VIEN CONG NGHE BUU CHINH VIEN THONG";
 
 	//-------load file ve notepad-------
@@ -60,29 +86,29 @@ void DrawTable() {
 
 	for (int ix = 22; ix <= 167; ix++) {
 		//ve dong ben tren so 1
-		gotoxy(ix, Y_display);
+		gotoxy(ix, Y_Menu);
 		cout << char(177);
 
 		//ve dong ben tren so 2
-		gotoxy(ix, Y_display + 6);
+		gotoxy(ix, Y_Menu + 6);
 		cout << char(177);
 
 		//ve dong cuoi cung
-		gotoxy(ix, Y_display + 42);
+		gotoxy(ix, Y_Menu + 42);
 		cout << char(177);
 	}
 
 	for (int iy = 8; iy <= 49; iy++) {
 		//ve cot dau tien
-		gotoxy(X_display, iy);
+		gotoxy(X_Menu, iy);
 		cout << char(177);
 
 		//ve cot thu 2
-		gotoxy(X_display + 50, iy);
+		gotoxy(X_Menu + 50, iy);
 		cout << char(177);
 
 		//ve cot cuoi cung
-		gotoxy(X_display + 145, iy);
+		gotoxy(X_Menu + 145, iy);
 		cout << char(177);
 	}
 }
@@ -94,13 +120,13 @@ int scrollMenu() {
 	system("cls");
 	DrawTable(); //ve bang
 	for (int i = 0; i < Max_item; i++) {
-		gotoxy(X_display + 5, Y_display + 10 + (i * 4));
+		gotoxy(X_Menu + 5, Y_Menu + 10 + (i * 4));
 		cout << i + 1 << "/ " << menu_func[i];
 	}
 	//--------highlight dong dang chon--------
 	int pick = 0;
 	HighlightLine();
-	gotoxy(X_display + 5, Y_display + 10);
+	gotoxy(X_Menu + 5, Y_Menu + 10);
 	cout << pick + 1 << "/ " << menu_func[pick];
 	//--------kiem tra nut len xuong
 	char signal;
@@ -113,44 +139,44 @@ int scrollMenu() {
 		case KEY_UP:
 			if (pick + 1 > 1) {
 				NormalLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 				pick--;
 
 				HighlightLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 			}
 			else {
 				NormalLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 				pick = Max_item - 1;
 
 				HighlightLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 			}
 			break;
 		case KEY_DOWN:
 			if (pick + 1 < Max_item) {
 				NormalLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 				pick++;
 
 				HighlightLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 			}
 			else {
 				NormalLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 				pick = 0;
 
 				HighlightLine();
-				gotoxy(X_display + 5, Y_display + 10 + pick * 4);
+				gotoxy(X_Menu + 5, Y_Menu + 10 + pick * 4);
 				cout << pick + 1 << "/ " << menu_func[pick];
 			}
 			break;
@@ -205,6 +231,7 @@ void Menu() {
 			break;
 		case 3:
 			system("color 0E");
+			MenuManagerHD(dsnv, dsvt);
 			break;
 		case 4:
 			system("color 0E");
@@ -223,6 +250,7 @@ void Menu() {
 			quit = true;
 			system("cls");
 			WriteNVToFile(dsnv);
+			WriteVtToFile(dsvt);
 			break;
 		}
 	}
@@ -358,13 +386,11 @@ void RemoveForm(int sl) {
 //========== End: Bang xoa thong tin ===========
 
 //---------- Ve bang thong bao -----------
-void Notification(string nd) {
+void Notification() {
 	//SetColor(6);
 	ShowCur(0);
 	gotoxy(X_Notification + 20, Y_Notification);
 	cout << "THONG BAO";
-	gotoxy(X_Notification + 2, Y_Notification + 4);
-	cout << nd;
 	for (int ix = X_Notification; ix <= X_Notification + 50; ix++) {
 		//ve hang tren thu nhat
 		gotoxy(ix, Y_Notification - 2);
@@ -399,11 +425,6 @@ void Notification(string nd) {
 	cout << char(187);
 	gotoxy(X_Notification + 50, Y_Notification + 6);
 	cout << char(188);
-
-	Sleep(1000);
-	DeleteNotification();
-
-	ShowCur(1);
 }
 
 //------------ xoa bang thong bao -----------
@@ -568,7 +589,7 @@ void DrawBorderFuncNV(int x, int y, int length, int height) {
 int PrintOrUpdate(int index) {
 	system("color 0E");
 	for (int i = 15; i <= 48; i++) {
-		gotoxy(X_display + 2, i);
+		gotoxy(X_Menu + 2, i);
 		cout << left << setw(45) << " ";
 	}
 	string ListChoice[4] = {"Cap nhat vat tu", "In danh sach vat tu", "Cap nhat nhan vien", "In danh sach nhan vien"};

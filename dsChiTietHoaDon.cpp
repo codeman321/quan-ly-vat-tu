@@ -1,8 +1,14 @@
 #include <iostream>
 #include <string>
 #include "dsChiTietHoaDon.h"
+#include "dsHoaDon.h"
+#include "GlobalVariables.h"
+#include "UserInterface.h"
+#include "mylib.h"
 
 using namespace std;
+extern string ContentCTHD[5];
+extern int XKeyContentCTHD[5];
 
 void Init_cthd(chi_tiet_hd &cthd) {
 	cthd.maVT = "";
@@ -20,19 +26,19 @@ cthd_Node* MakeCthdNode(chi_tiet_hd data) {
 }
 
 //them cuoi 1 chi tiet hoa don
-void AddLastCthd(ds_chi_tiet_hd &ds, chi_tiet_hd data) {
+void AddLastCthd(ds_chi_tiet_hd*& ds, chi_tiet_hd data) {
 	cthd_Node* newNode = MakeCthdNode(data);
-	if (ds.head == NULL) {
-		ds.head = newNode;
+	if (ds->head == NULL) {
+		ds->head = newNode;
 	}
 	else {
-		cthd_Node* temp = ds.head;
+		cthd_Node* temp = ds->head;
 		while (temp->next != NULL) {
 			temp = temp->next;
 		}
 		temp->next = newNode;
 	}
-	ds.n_cthd++;
+	ds->n_cthd++;
 }
 
 //Xoa cuoi 1 chi tiet hoa don
@@ -58,4 +64,3 @@ bool DeleteLastCthd(ds_chi_tiet_hd& ds) {
 	delete last;
 	return true; //tra ve thong bao xoa thanh cong
 }
-

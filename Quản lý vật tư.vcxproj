@@ -129,7 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Constrain.cpp" />
     <ClCompile Include="dsChiTietHoaDon.cpp" />
-    <ClCompile Include="dsHoaDoncpp.cpp" />
+    <ClCompile Include="dsHoaDon.cpp" />
     <ClCompile Include="dsNhanVien.cpp" />
     <ClCompile Include="dsVatTu.cpp" />
     <ClCompile Include="Main.cpp" />

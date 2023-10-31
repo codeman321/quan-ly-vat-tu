@@ -30,7 +30,7 @@
     <ClCompile Include="dsNhanVien.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
-    <ClCompile Include="dsHoaDoncpp.cpp">
+    <ClCompile Include="dsHoaDon.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
     <ClCompile Include="dsChiTietHoaDon.cpp">

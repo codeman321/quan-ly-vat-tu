@@ -62,8 +62,8 @@
 #define NumberPerPage 10
 
 //toa do in bang menu
-#define X_display 22
-#define Y_display 8
+#define X_Menu 22
+#define Y_Menu 8
 
 //toa do in bang hoi xoa thong tin
 #define X_RemoveConfirm 140
@@ -85,7 +85,7 @@
 #define X_Title 90
 #define Y_Title 2
 
-//toa do in bang nhap thong tin
+//toa do in bang nhap thong tin 
 #define X_InputForm 140
 #define Y_InputForm 5
 

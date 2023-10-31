@@ -9,11 +9,6 @@
 #include "ProcessionFile.h"
 
 using namespace std;
-
-int TotalVtPage = 1;
-int CurVtPage = 1;
-int TotalVtPageAscending = 1;
-int CurVtPageAscending = 1;
 extern string ContentVT[4];
 
 //-------- tao danh sach vat tu ---------
@@ -89,10 +84,11 @@ int CountVtNode(Vt_Node root) {
 //------- cap nhat mang luu cac node vat tu ---------
 void UpdateArrVtList(Vt_Node root, Vt_Node VtNodeList[], int& index) {
 	if (root != NULL) {
+		UpdateArrVtList(root->left, VtNodeList, index);
+
 		VtNodeList[index] = root;
 		index++;
 
-		UpdateArrVtList(root->left, VtNodeList, index);
 		UpdateArrVtList(root->right, VtNodeList, index);
 	}
 }
@@ -118,7 +114,7 @@ int getBalanceFactor(Vt_Node root) {
 	if (root == NULL) {
 		return 0;
 	}
-	return height(root->left) + height(root->right);
+	return height(root->left) - height(root->right);
 }
 
 //-------- thao tac them vat tu ----------
@@ -137,7 +133,7 @@ Vt_Node AddVt(Vt_Node& root, vat_tu vt) {
 	}
 
 	//cap nhat lai do cao cua cay khi da them 1 node
-	root->height = max(height(root->left), height(root->right));
+	root->height = max(height(root->left), height(root->right)) + 1;
 
 	//kiem tra lieu cay co bi mat can bang khi them node khong
 	int BalanceFactor = getBalanceFactor(root);
@@ -234,8 +230,8 @@ Vt_Node DeleteVt(Vt_Node& root, string ID) {
 
 	//can bang lai cay
 	int BalanceFactor = getBalanceFactor(root);
-	
-	//left left		
+
+	//left left
 	if (BalanceFactor > 1 && ID < root->left->data.ma_vt) {
 		return RightRotation(root);
 	}
@@ -256,10 +252,11 @@ Vt_Node DeleteVt(Vt_Node& root, string ID) {
 		root->right = RightRotation(root->right);
 		return LeftRotation(root);
 	}
+
 	return root;
 }
 
-//---------- hien thong tin nhan vien -----------
+//---------- hien thong tin vat tu -----------
 void ShowVt(vat_tu vt, int pos) {
 	int xKeyContent[5] = { 12, 30, 65, 100, 113 };
 
@@ -273,12 +270,14 @@ void ShowVt(vat_tu vt, int pos) {
 	cout << left << setw(5) << vt.sl_ton;
 }
 
-//---------- in thong tin nhan vien tren 1 trang ---------
-void ShowListVtOnePage(Vt_Node root, int StartIndex) {
+//---------- in thong tin vat tu tren 1 trang ---------
+void ShowListVtOnePage(Vt_Node root, int StartIndex, int CurVtPage, int TotalVtPage) {
 	Vt_Node VtNodeList[Max_itemVt];
 	int index = 0;
 	UpdateArrVtList(root, VtNodeList, index);
 
+	gotoxy(X_DisplayNum + 18, Y_DisplayNum);
+	cout << "      ";
 	gotoxy(X_DisplayNum, Y_DisplayNum);
 	cout << "So luong vat tu: " << index;
 	int i;
@@ -290,22 +289,28 @@ void ShowListVtOnePage(Vt_Node root, int StartIndex) {
 	cout << " Trang " << CurVtPage << "/" << TotalVtPage;
 }
 
-//---------- thay doi trang in nhan vien ----------
-void ChangeVtManagerPage(Vt_Node root) {
+//---------- thay doi trang in vat tu ----------
+void ChangeVtManagerPage(Vt_Node root, int CurVtPage, int TotalVtPage) {
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan li nhan vien ";
-	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage, CurVtPage, TotalVtPage);
 }
 
-Vt_Node PickItemVt(Vt_Node root, int& pick) {
+Vt_Node PickItemVt(Vt_Node root, int& pick, int& CurVtPage, int& TotalVtPage) {
 	ShowCur(0);
 	Vt_Node VtNodeList[Max_itemVt];
+	int sl = 0;
+	UpdateArrVtList(root, VtNodeList, sl);
+
+	int lower_bound = (CurVtPage - 1) * NumberPerPage;
+	pick = lower_bound;
 	int index = 0;
-	UpdateArrVtList(root, VtNodeList, index);
+	int upper_bound = CurVtPage * NumberPerPage;
 
 	//--------highlight dong dang chon--------
 	HighlightLine2();
-	ShowVt(VtNodeList[pick]->data, pick);
+	HighLightArrow(index);
+	ShowVt(VtNodeList[pick]->data, index);
 	//--------kiem tra nut len xuong
 	char signal;
 	while (true) {
@@ -315,37 +320,73 @@ Vt_Node PickItemVt(Vt_Node root, int& pick) {
 		}
 		switch (signal) {
 		case KEY_UP:
-			if (pick + 1 > 1) {
+			if (pick > lower_bound && index > 0) {
 				NormalLine();
-				ShowVt(VtNodeList[pick]->data, pick);
-				pick--;
+				DeleteArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
+				pick--; index--;
 
 				HighlightLine2();
-				ShowVt(VtNodeList[pick]->data, pick);
+				HighLightArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
 		case KEY_DOWN:
-			if (pick + 1 < index) {
+			if (pick + 1 < sl && pick + 1 < upper_bound && index < NumberPerPage) {
 				NormalLine();
-				ShowVt(VtNodeList[pick]->data, pick);
-				pick++;
+				DeleteArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
+				pick++; index++;
 
 				HighlightLine2();
-				ShowVt(VtNodeList[pick]->data, pick);
+				HighLightArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
+			}
+			break;
+		case PAGE_UP:
+			if (CurVtPage > 1) {
+				CurVtPage--;
+				lower_bound = (CurVtPage - 1) * NumberPerPage;
+				upper_bound = CurVtPage * NumberPerPage;
+				DeleteArrow(index);
+				index = 0;
+				pick = lower_bound;
+				NormalLine();
+				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
+				HighlightLine2();
+				HighLightArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
+			}
+			break;
+		case PAGE_DOWN:
+			if (CurVtPage < TotalVtPage) {
+				CurVtPage++;
+				lower_bound = (CurVtPage - 1) * NumberPerPage;
+				upper_bound = CurVtPage * NumberPerPage;
+				DeleteArrow(index);
+				index = 0;
+				pick = lower_bound;
+				NormalLine();
+				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
+				HighlightLine2();
+				HighLightArrow(index);
+				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
 		case ENTER:
 			NormalLine();
+			DeleteArrow(index);
 			return VtNodeList[pick]; //luu lua chon de thuc hien chuc nang ham Menu
 		case ESC:
 			NormalLine();
+			DeleteArrow(index);
 			return NULL;
 		}
 	}
 }
 
 //-------- nhap 1 vat tu ----------
-void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
+void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& TotalVtPage) {
 	ShowCur(1);
 	bool Saved = true; //bien kiem tra luu danh sach
 	string vt_ma;
@@ -365,12 +406,12 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			if (Edited) {
 				string ContentVT[4] = { "Ma vat tu", "Ten vat tu", "Don vi tinh", "SL ton" };
 				int pick = 0;
-				Vt_Node EditedNode = PickItemVt(root, pick); //thuc hien tim node muon chinh sua
+				Vt_Node EditedNode = PickItemVt(root, pick, CurVtPage, TotalVtPage); //thuc hien tim node muon chinh sua
 
-				//truong hop an nut ESC de thoat
+				//truong hop an nut ESC de thoat`
 				if (EditedNode == NULL) {
 					TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
-					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage, CurVtPage, TotalVtPage);
 					return;
 				}
 				
@@ -401,12 +442,21 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			//kiem tra viec xoa thong tin
 			if (Deleted) {
 				int pick = 0;
-				Vt_Node DeleteNode = PickItemVt(root, pick); //thuc hien tim node muon xoa
+				Vt_Node DeleteNode = PickItemVt(root, pick, CurVtPage, TotalVtPage); //thuc hien tim node muon xoa
 
 				//truong hop an nut ESC de thoat
 				if (DeleteNode == NULL) {
 					TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
-					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+					ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage, CurVtPage, TotalVtPage);
+					return;
+				}
+
+				//truong hop vat tu da nam trong hoa don
+				if (DeleteNode->data.used) {
+					Notification();
+					gotoxy(X_Notification + 2, Y_Notification + 4);
+					cout << "Vat tu da o trong hoa don. Khong the xoa!";
+					Sleep(1000);
 					return;
 				}
 
@@ -422,12 +472,15 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 				}
 				else {
 					root = DeleteVt(root, DeleteNode->data.ma_vt);
-					Notification("Xoa vat tu thanh cong!");
+					Notification();
+					gotoxy(X_Notification + 2, Y_Notification + 4);
+					cout << "Xoa vat tu thanh cong!";
+					Sleep(1000);
+					DeleteNotification();
 				}
 
 				TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
-				ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
-				WriteVtToFile(root);
+				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 				return;
 			}
 
@@ -438,14 +491,24 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			}
 			checked = FindVtNode(root, vt_ma);
 			if (vt_ma == "") {
-				Notification("Ma vat tu khong duoc phep trong!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Ma vat tu khong duoc phep trong!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 				break;
 			}
 			//Kiem tra trong truong hop nhap
 			if (checked != NULL) {
-				Notification("Ma vat tu da ton tai!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Ma vat tu da ton tai!";
+				Sleep(1000);
+				DeleteNotification();
 				vt_ma = "";
 				RemoveForm(1);
+				ShowCur(1);
 				break;
 			}
 			step++;
@@ -453,15 +516,25 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 		case 2: //nhap ten vat tu
 			TypeWordAndSpace(vt_ten, step, Saved, 30, 5);
 			if (vt_ten == "") {
-				Notification("Ten vat tu khong duoc phep rong!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Ten vat tu khong duoc phep rong!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 				break;
 			}
 			step++;
 			break;
 		case 3: //nhap don vi tinh
-			TypeOnlyAWord(vt_dvt, step, Saved, 10, 5);
+			TypeWordAndNumber(vt_dvt, step, Saved, 10, 5);
 			if (vt_dvt == "") {
-				Notification("Don vi tinh khong duoc phep rong!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Don vi tinh khong duoc phep rong!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 				break;
 			}
 			step++;
@@ -473,7 +546,12 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			}
 			TypeOnlyNumber(vt_slton, step, Saved, 1000000, 5);
 			if (vt_slton == 0) {
-				Notification("So luong ton phai >= 1!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "So luong ton phai >= 1!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 				break;
 			}
 			step++;
@@ -485,9 +563,15 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 				temp->data.dvt = vt_dvt;
 				temp->data.sl_ton = vt_slton;
 
-				Notification("Chinh sua vat tu thanh cong!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Chinh sua vat tu thanh cong!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 				TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
-				ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+				CurVtPage = TotalVtPage;
+				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 				RemoveFormComplete(4);
 				return;
 			}
@@ -499,10 +583,13 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 				vt.sl_ton = vt_slton;
 
 				root = AddVt(root, vt);
-				Notification("Them vat tu thanh cong!");
+				Notification();
+				gotoxy(X_Notification + 2, Y_Notification + 4);
+				cout << "Them vat tu thanh cong!";
+				Sleep(1000);
+				DeleteNotification();
+				ShowCur(1);
 			}
-
-			WriteVtToFile(root);
 			vt_ma = "";
 			vt_ten = "";
 			vt_dvt = "";
@@ -512,7 +599,8 @@ void InputVt(Vt_Node& root, bool Edited = false, bool Deleted = false) {
 			temp = NULL;
 
 			TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
-			ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+			CurVtPage = TotalVtPage;
+			ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 			RemoveForm(4);
 		}
 	}
@@ -524,10 +612,10 @@ void MenuManageVT(Vt_Node& root) {
 	ShowCur(0);
 	system("cls");
 
-	CurVtPage = 1;
-	TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
+	int CurVtPage = 1;
+	int TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
 	Display(ContentVT, sizeof(ContentVT) / sizeof(string), true);
-	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage);
+	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage, CurVtPage, TotalVtPage);
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan ly vat tu ";
 
@@ -542,31 +630,44 @@ void MenuManageVT(Vt_Node& root) {
 				event = _getch();//lay cac ki tu dac biet
 				if (event == PAGE_UP && CurVtPage > 1) {
 					CurVtPage--;
-					ChangeVtManagerPage(root);
+					ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 				}
-				else if (event == PAGE_DOWN && CurVtPage < TotalVtPage) {
-					CurVtPage++;
-					ChangeVtManagerPage(root);
+				else if (event == PAGE_DOWN) {
+					TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
+					if (CurVtPage < TotalVtPage) {
+						CurVtPage++;
+						ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
+					}
 				}
 				else if (event == INSERT) {//them moi vat tu
 					string ContentVT[4] = { "Ma vat tu", "Ten vat tu", "Don vi tinh", "SL ton" };
 					CreateInputForm(ContentVT, 4, 50);
-					InputVt(root);
+					InputVt(root, false, false, CurVtPage, TotalVtPage);
 					ShowCur(0);
 				}
 				else if (event == DEL) {
 					if (CountVtNode(root) == 0) {
-						Notification("Danh sach rong, khong the xoa");
+						Notification();
+						gotoxy(X_Notification + 2, Y_Notification + 4);
+						cout << "Danh sach rong, khong the xoa";
+						Sleep(1000);
+						DeleteNotification();
+						ShowCur(1);
 						return;
 					}
-					InputVt(root, false, true);
+					InputVt(root, false, true, CurVtPage, TotalVtPage);
 				}
 				else if (event == HOME) {
 					if (CountVtNode(root) == 0) {
-						Notification("Danh sach rong, khong the chinh sua");
+						Notification();
+						gotoxy(X_Notification + 2, Y_Notification + 4);
+						cout << "Danh sach rong, khong the chinh sua";
+						Sleep(1000);
+						DeleteNotification();
+						ShowCur(1);
 						return;
 					}
-					InputVt(root, true, false);
+					InputVt(root, true, false, CurVtPage, TotalVtPage);
 					ShowCur(0);
 				}
 			}
@@ -575,7 +676,7 @@ void MenuManageVT(Vt_Node& root) {
 }
 
 //---------- in thong tin nhan vien tren 1 trang ---------
-void ShowListVtOnePageAscending(Vt_Node ds[], int StartIndex, int sl) {
+void ShowListVtOnePageAscending(Vt_Node ds[], int StartIndex, int sl, int CurVtPageAscending, int TotalVtPageAscending) {
 	gotoxy(X_DisplayNum, Y_DisplayNum);
 	cout << "So luong vat tu: " << sl;
 	int i;
@@ -588,32 +689,63 @@ void ShowListVtOnePageAscending(Vt_Node ds[], int StartIndex, int sl) {
 }
 
 //---------- thay doi trang in nhan vien ----------
-void ChangeVtManagerPageAscending(Vt_Node ds[], int sl) {
+void ChangeVtManagerPageAscending(Vt_Node ds[], int sl, int CurVtPageAscending, int TotalVtPageAscending) {
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan ly vat tu ";
-	ShowListVtOnePageAscending(ds, (CurVtPageAscending - 1) * NumberPerPage, sl);
+	ShowListVtOnePageAscending(ds, (CurVtPageAscending - 1) * NumberPerPage, sl, CurVtPageAscending, TotalVtPageAscending);
 }
 
-void DisplayAscendingNV(Vt_Node temp_ds[], int sl) {
+void DisplayAscendingNV(Vt_Node temp_ds[], int sl, int CurVtPageAscending, int TotalVtPageAscending) {
 	system("color 0E");
 	ShowCur(0);
 	system("cls");
 
-	CurVtPageAscending = 1;
-	TotalVtPageAscending = (int)ceil((double)sl / NumberPerPage);
 	Display(ContentVT, sizeof(ContentVT) / sizeof(string), false);
-	ShowListVtOnePageAscending(temp_ds, 0, sl);
+	ShowListVtOnePageAscending(temp_ds, 0, sl, CurVtPageAscending, TotalVtPageAscending);
 	gotoxy(X_Title, Y_Title);
 	cout << " Quan ly vat tu ";
 }
 
+void quickSort(Vt_Node temp_ds[], int left, int right) {
+	if (left < right) {
+		int pivotIndex = partition(temp_ds, left, right);
+
+		//Sap xep cac phan tu truoc va sau pivot
+		quickSort(temp_ds, left, pivotIndex - 1);
+		quickSort(temp_ds, pivotIndex + 1, right);
+	}
+}
+
+int partition(Vt_Node temp_ds[], int left, int right) {
+	Vt_Node pivot = temp_ds[right];
+	int i = (left - 1);  //Chi so cua phan tu <= pivot
+
+	for (int j = left; j < right; j++) {
+		if (temp_ds[j]->data.ten_vt <= pivot->data.ten_vt) {
+			i++;
+			Vt_Node t = temp_ds[i];
+			temp_ds[i] = temp_ds[j];
+			temp_ds[j] = t;
+		}
+	}
+
+	Vt_Node t = temp_ds[i + 1];
+	temp_ds[i + 1] = temp_ds[right];
+	temp_ds[right] = t;
+
+	return i + 1;
+}
+
 //------ in danh sach vat tu tang dan theo ten -------
 void PrintListVT(Vt_Node root) {
-	Vt_Node temp_ds[Max_item];
+	Vt_Node temp_ds[Max_itemVt];
 	int temp_sl = 0;
 	UpdateArrVtList(root, temp_ds, temp_sl);
 
-	for (int i = 0; i < temp_sl; i++) {
+	int CurVtPageAscending = 1;
+	int TotalVtPageAscending = (int)ceil((double)temp_sl / NumberPerPage);
+
+	/*for (int i = 0; i < temp_sl; i++) {
 		for (int j = i + 1; j < temp_sl; j++) {
 			if (temp_ds[i]->data.ten_vt > temp_ds[j]->data.ten_vt) {
 				Vt_Node t;
@@ -622,8 +754,11 @@ void PrintListVT(Vt_Node root) {
 				temp_ds[j] = t;
 			}
 		}
-	}
-	DisplayAscendingNV(temp_ds, temp_sl);
+	}*/
+
+	quickSort(temp_ds, 0, temp_sl - 1);
+
+	DisplayAscendingNV(temp_ds, temp_sl, CurVtPageAscending, TotalVtPageAscending);
 	int c;
 	while (true) {
 		while (_kbhit()) {
@@ -635,11 +770,11 @@ void PrintListVT(Vt_Node root) {
 				c = _getch();//lay cac ki tu dac biet
 				if (c == PAGE_UP && CurVtPageAscending > 1) {
 					CurVtPageAscending--;
-					ChangeVtManagerPageAscending(temp_ds, temp_sl);
+					ChangeVtManagerPageAscending(temp_ds, temp_sl, CurVtPageAscending, TotalVtPageAscending);
 				}
 				else if (c == PAGE_DOWN && CurVtPageAscending < TotalVtPageAscending) {
 					CurVtPageAscending++;
-					ChangeVtManagerPageAscending(temp_ds, temp_sl);
+					ChangeVtManagerPageAscending(temp_ds, temp_sl, CurVtPageAscending, TotalVtPageAscending);
 				}
 			}
 		}

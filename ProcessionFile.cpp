@@ -30,12 +30,39 @@ void WriteNVToFile(dsNV ds) {
 	fileout.open("DSNV.TXT", ios_base::out);// ios_base::out la de ghi vao file
 	if (fileout.is_open()) {
 		for (int i = 0; i < ds.n_nv; i++) {
-			fileout << ds.dsnv[i]->maNV << "\n" << ds.dsnv[i]->ho << "\n" << ds.dsnv[i]->ten << "\n" << ds.dsnv[i]->phai << endl;
+			fileout << ds.dsnv[i]->maNV << "\n" << ds.dsnv[i]->ho << "\n" << ds.dsnv[i]->ten << "\n" << ds.dsnv[i]->phai << "\n";
+			fileout << ds.dsnv[i]->used << "\n";
+			if (!ds.dsnv[i]->used) continue;
+			fileout << ds.dsnv[i]->dshd->n_hd << "\n";
+			
+			hd_Node* hd = ds.dsnv[i]->dshd->head;
+			for (int j = 0; j < ds.dsnv[i]->dshd->n_hd; j++) {
+				fileout << hd->data.soHD << "\n";
+				fileout << hd->data.ngay_lapHD.ngay << "\n" 
+						<< hd->data.ngay_lapHD.thang << "\n" 
+						<< hd->data.ngay_lapHD.nam << "\n";
+				fileout << hd->data.loai << "\n";
+				fileout << hd->data.dscthd->n_cthd << "\n";
+
+				cthd_Node* cthd = hd->data.dscthd->head;
+				for (int k = 0; k < hd->data.dscthd->n_cthd; k++) {
+					fileout << cthd->data.maVT << "\n";
+					fileout << cthd->data.sl << "\n";
+					fileout << cthd->data.donGia << "\n";
+					fileout << cthd->data.VAT << "\n";
+					cthd = cthd->next;
+				}
+				hd = hd->next;
+			}
+			fileout << "\n";
 		}
 	}
 	else {
-	
-		Notification("Ket noi file de ghi vao that bai");
+		Notification();
+		gotoxy(X_Notification + 2, Y_Notification + 4);
+		cout << "Ket noi file de ghi vao that bai";
+		Sleep(1000);
+		DeleteNotification();
 	}
 	fileout.close();
 }
@@ -45,8 +72,7 @@ void ReadNVFile(dsNV& ds) {
 	ifstream filein;
 	filein.open("DSNV.TXT", ios_base::in);// ios_base::in la de doc
 
-	string temp;
-	int i = 0;
+	int idx = 0;
 	if (filein.is_open()) {
 		while (!filein.eof()) {
 			nhan_vien* nv = new nhan_vien;
@@ -55,11 +81,52 @@ void ReadNVFile(dsNV& ds) {
 			getline(filein, nv->ho);
 			getline(filein, nv->ten);
 			getline(filein,nv->phai);
+			
+			string nv_used;
+			getline(filein, nv_used);
+			(nv_used == "1") ? nv->used = true : nv->used = false;
+
+			if (nv->used) {
+				int sl_hd;
+				filein >> sl_hd;
+				filein.ignore();
+				nv->dshd->n_hd = sl_hd;
+				for (int i = 0; i < sl_hd; i++) {
+					hoa_don hd;
+					getline(filein, hd.soHD);
+					filein >> hd.ngay_lapHD.ngay;
+					filein >> hd.ngay_lapHD.thang;
+					filein >> hd.ngay_lapHD.nam;
+					filein >> hd.loai;
+					AddLastListHD(nv->dshd, hd);
+					
+					int sl_cthd;
+					filein >> sl_cthd;
+					for (int j = 0; j < sl_cthd; j++) {
+						filein.ignore();
+						chi_tiet_hd cthd;
+						getline(filein, cthd.maVT);
+						filein >> cthd.sl;
+						filein >> cthd.donGia;
+						filein >> cthd.VAT;
+						AddLastCthd(nv->dshd->head->data.dscthd, cthd);
+					}
+				}
+				filein.ignore();
+			}
+
 			// cap nhat phan tu trong mang con tro
-			ds.dsnv[i++] = nv;
+			ds.dsnv[idx++] = nv;
 			// cap nhat so luong phan tu trong mang
 			ds.n_nv++;
 		}
+	}
+	else {
+		Notification();
+		gotoxy(X_Notification + 2, Y_Notification + 4);
+		cout << "Ket noi file de doc vao that bai";
+		Sleep(1000);
+		DeleteNotification();
 	}
 	filein.close();
 }
@@ -70,12 +137,13 @@ void WriteAVt(Vt_Node root, ofstream& fileout) {
 	fileout << root->data.ten_vt << endl;
 	fileout << root->data.dvt << endl;
 	fileout << root->data.sl_ton << endl;
+	fileout << root->data.used << endl;
 }
 
 void WriteVtList(Vt_Node root, ofstream& fileout) {
 	if (root != NULL) {
-		WriteAVt(root, fileout);
 		WriteVtList(root->left, fileout);
+		WriteAVt(root, fileout);
 		WriteVtList(root->right, fileout);
 	}
 }
@@ -88,8 +156,11 @@ void WriteVtToFile(Vt_Node root) {
 		WriteVtList(root, fileout);
 	}
 	else {
-
-		Notification("Ket noi file de ghi vao that bai");
+		Notification();
+		gotoxy(X_Notification + 2, Y_Notification + 4);
+		cout << "Ket noi file de ghi vao that bai";
+		Sleep(1000);
+		DeleteNotification();
 	}
 	fileout.close();
 }
@@ -107,10 +178,21 @@ void ReadVtFile(Vt_Node& root) {
 			getline(filein, vt.ten_vt);
 			getline(filein, vt.dvt);
 			filein >> vt.sl_ton;
+
+			int vt_used;
+			filein >> vt_used;
+			(vt_used == 1) ? vt.used = true : vt.used = false;
 			filein.ignore();
 
 			root = AddVt(root, vt);
 		}
+	}
+	else {
+		Notification();
+		gotoxy(X_Notification + 2, Y_Notification + 4);
+		cout << "Ket noi file de doc vao that bai";
+		Sleep(1000);
+		DeleteNotification();
 	}
 	filein.close();
 }
