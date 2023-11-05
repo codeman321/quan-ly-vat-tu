@@ -14,7 +14,7 @@ extern string ContentNV[4];
 extern string ContentHD[4];
 extern string ContentVT[4];
 extern string ContentCTHD[5];
-extern int XKeyContentCTHD[6];
+extern int xKeyContentCTHD[7];
 
 //----------- tim chi so cua ma nhan vien ---------
 int FindIndexNV(dsNV ds, string ma) {
@@ -169,13 +169,24 @@ void PrintListNV(dsNV ds) {
 int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 	ShowCur(0);
 
+	//truong hop khong co nhan vien nao
+	if (!ds.n_nv) {
+		char signal;
+		while (true) {
+			signal = _getch();
+			if (signal == ESC) {
+				return -1;
+			}
+		}
+	} 
+
 	//--------highlight dong dang chon--------
 	int lower_bound = (CurNVPage - 1) * NumberPerPage;
 	int pick = lower_bound;
 	int index = 0;
 	int upper_bound = CurNVPage * NumberPerPage;
 	HighlightLine2();
-	HighLightArrow(index);
+	HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 	ShowNV(ds.dsnv[pick], index);
 
 	//--------kiem tra nut len xuong
@@ -189,24 +200,24 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 		case KEY_UP:
 			if (pick > lower_bound && index > 0) {
 				NormalLine();
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 				pick--; index--;
 
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
 		case KEY_DOWN:
 			if (pick + 1 < ds.n_nv && pick + 1 < upper_bound && index < NumberPerPage) {
 				NormalLine();
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 				pick++; index++;
 
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
@@ -215,13 +226,13 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 				CurNVPage--;
 				lower_bound = (CurNVPage - 1) * NumberPerPage;
 				upper_bound = CurNVPage * NumberPerPage;
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
@@ -230,23 +241,23 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 				CurNVPage++;
 				lower_bound = (CurNVPage - 1) * NumberPerPage;
 				upper_bound = CurNVPage * NumberPerPage;
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
 		case ENTER:
 			NormalLine();
-			DeleteArrow(index);
+			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 			return pick; //luu lua chon de thuc hien chuc nang ham Menu
 		case ESC:
 			NormalLine();
-			DeleteArrow(index);
+			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 			return -1;
 		}
 	}
@@ -713,7 +724,7 @@ int InputHD(nhan_vien*& nv) {
 	ShowCur(0);
 }
 
-//----------- nhap chi tiet chi tiet hoa don ----------
+//----------- nhap chi tiet hoa don ----------
 int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 	ShowCur(1);
 	bool Saved = true;//kiem tra luu lai hay chua
@@ -793,8 +804,8 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 			step++;
 			break;
 		}
-		case 6:
-			AddLastCthd(nv->dshd->head->data.dscthd, cthd);
+		case 6: {
+			AddLastCthd(temp->data.dscthd, cthd);
 			if (temp->data.loai == 'X') {
 				dsvt_vt->data.sl_ton -= cthd.sl;
 			}
@@ -804,6 +815,7 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 			dsvt_vt->data.used = true;
 			system("cls");
 			return 1;
+		}
 		}
 	}
 	ShowCur(0);
@@ -825,13 +837,16 @@ int PickNVMakeHD(dsNV ds, int CurNVPage, int TotalNVPage) {
 //--------- chon vat tu them vao hoa don ----------
 void DisplayMenuDSHD(nhan_vien* nv, hd_Node* temp, Vt_Node root, int CurHDPage, int TotalHDPage) {
 	system("cls");
+	gotoxy(X_Title, Y_Title);
+	cout << " Chon vat tu de lap hoa don ";
 	TableOfHD();
+	ButtonFunction();
 	gotoxy(X_Display + 5, Y_Display + 14);
 	cout << "So hoa don             :   " << temp->data.soHD;
 	gotoxy(X_Display + 5, Y_Display + 18);
 	cout << "Ma nhan vien           :   " << nv->maNV;
 	gotoxy(X_Display + 5, Y_Display + 22);
-	cout << "Ten nhan vien          :   " << nv->ten;
+	cout << "Ho va ten nhan vien    :   " << nv->ho << " " << nv->ten;
 	gotoxy(X_Display + 5, Y_Display + 26);
 	cout << "Ngay lap hoa don       :   " << StandardDate(temp->data.ngay_lapHD.ngay, temp->data.ngay_lapHD.thang, temp->data.ngay_lapHD.nam);
 	gotoxy(X_Display + 5, Y_Display + 30);
@@ -908,8 +923,104 @@ void MenuManagerHD(dsNV& ds, Vt_Node& root) {
 			return;
 		}
 	}
+}
 
-	gotoxy(X_Notification, Y_Notification);
-	cout << "----------------------------";
-	Sleep(100000);
+
+//=============== cau f: in hoa don ====================
+//---------- the hien bang in hoa don -----------------
+void DisplayPrintingHD(nhan_vien* nv, hd_Node* hd, Vt_Node root, int CurCTHDPage, int TotalCTHDPage) {
+	system("cls");
+	gotoxy(X_Title, Y_Title);
+	cout << " In hoa don ";
+	TableOfHDWithValue();
+	gotoxy(X_Display + 5, Y_Display + 14);
+	cout << "So hoa don             :   " << hd->data.soHD;
+	gotoxy(X_Display + 5, Y_Display + 18);
+	cout << "Ma nhan vien           :   " << nv->maNV;
+	gotoxy(X_Display + 5, Y_Display + 22);
+	cout << "Ho va ten nhan vien    :   " << nv->ho << " " << nv->ten;
+	gotoxy(X_Display + 5, Y_Display + 26);
+	cout << "Ngay lap hoa don       :   " << StandardDate(hd->data.ngay_lapHD.ngay, hd->data.ngay_lapHD.thang, hd->data.ngay_lapHD.nam);
+	gotoxy(X_Display + 5, Y_Display + 30);
+	string loai;
+	hd->data.loai == 'N' ? loai = "Nhap" : loai = "Xuat";
+	cout << "Loai hoa don           :   " << loai;
+	ShowListCTHDOnePageWithValue(hd, root, (CurCTHDPage - 1) * NumberPerPage, CurCTHDPage, TotalCTHDPage);
+
+	double TotalValue = 0;
+	cthd_Node* cthd_temp = hd->data.dscthd->head;
+	for (int i = 0; i < hd->data.dscthd->n_cthd; i++) {
+		TotalValue += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+		cthd_temp = cthd_temp->next;
+	}
+	gotoxy(xKeyContentCTHD[5], Y_Display + 43);
+	cout << TotalValue;
+
+}
+
+//---------- In hoa don -----------
+void CheckingHD(dsNV ds, Vt_Node root) {
+	system("cls");
+	dsNV ds_temp;
+
+	int idx = 0;
+	int pick = 0;
+	for (int i = 0; i < ds.n_nv; i++) {
+		if (ds.dsnv[i]->used == 1) {
+			ds_temp.dsnv[idx++] = ds.dsnv[i];
+		}
+	}
+	ds_temp.n_nv = idx;
+
+	int CurNVPage = 1;
+	int TotalNVPage = (int)ceil((double)ds_temp.n_nv / NumberPerPage);
+
+	//chon nhan vien de in hoa don
+	gotoxy(X_Title - 40, Y_Title);
+	cout << " Chon nhan vien in hoa don ";
+	Display(ContentNV, sizeof(ContentNV) / sizeof(string), false);
+	ShowListNVOnePage(ds_temp, 0, CurNVPage, TotalNVPage);
+	pick = PickItemNv(ds_temp, CurNVPage, TotalNVPage);
+	if (pick == -1) {
+		return;
+	}
+
+	int CurHDPage = 1;
+	int TotalHDPage = (int)ceil((double)ds_temp.dsnv[pick]->dshd->n_hd / NumberPerPage);
+
+	//chon hoa don 
+	DrawTablePickHD();
+	ShowListHDOnePage(ds_temp.dsnv[pick]->dshd, 0, CurHDPage, TotalHDPage);
+	hd_Node* hd = PickHD(ds_temp.dsnv[pick]->dshd, CurHDPage, TotalHDPage);
+
+	//in hoa don
+	int CurCTHDPage = 1;
+	int TotalCTHDPage = (int)ceil((double)hd->data.dscthd->n_cthd/ NumberPerPage);
+
+	DisplayPrintingHD(ds_temp.dsnv[pick], hd, root, CurCTHDPage, TotalCTHDPage);
+
+	char signal;
+	while (true) {
+		signal = _getch(); //kiem tra co nhap gi tu ban phim khong
+		if (signal == -32) {
+			signal = _getch();
+		}
+		switch (signal) {
+		case PAGE_UP:
+			if (CurCTHDPage > 1) {
+				CurCTHDPage--;
+				ShowListCTHDOnePageWithValue(hd, root, (CurCTHDPage - 1) * NumberPerPage, CurCTHDPage, TotalCTHDPage);
+			}
+			break;
+		case PAGE_DOWN:
+			if (CurCTHDPage < TotalCTHDPage) {
+				CurCTHDPage++;
+				ShowListCTHDOnePageWithValue(hd, root, (CurCTHDPage - 1) * NumberPerPage, CurCTHDPage, TotalCTHDPage);
+			}
+			break;
+		case ESC:
+			NormalLine();
+			return;
+		}
+	}
 }

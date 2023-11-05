@@ -22,7 +22,7 @@ Vt_Node MakeVtNode(vat_tu vt) {
 	newNode->data = vt;
 	newNode->left = NULL;
 	newNode->right = NULL;
-	newNode->height = 1;
+	newNode->height = 0;
 	return newNode;
 }
 
@@ -271,7 +271,7 @@ void ShowVt(vat_tu vt, int pos) {
 }
 
 //---------- in thong tin vat tu tren 1 trang ---------
-void ShowListVtOnePage(Vt_Node root, int StartIndex, int CurVtPage, int TotalVtPage) {
+void ShowListVtOnePage(Vt_Node root, int StartIndex, int CurVtPage, int TotalVtPage) {  //*sua lai mang dong
 	Vt_Node VtNodeList[Max_itemVt];
 	int index = 0;
 	UpdateArrVtList(root, VtNodeList, index);
@@ -309,7 +309,7 @@ Vt_Node PickItemVt(Vt_Node root, int& pick, int& CurVtPage, int& TotalVtPage) {
 
 	//--------highlight dong dang chon--------
 	HighlightLine2();
-	HighLightArrow(index);
+	HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 	ShowVt(VtNodeList[pick]->data, index);
 	//--------kiem tra nut len xuong
 	char signal;
@@ -322,24 +322,24 @@ Vt_Node PickItemVt(Vt_Node root, int& pick, int& CurVtPage, int& TotalVtPage) {
 		case KEY_UP:
 			if (pick > lower_bound && index > 0) {
 				NormalLine();
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 				pick--; index--;
 
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
 		case KEY_DOWN:
 			if (pick + 1 < sl && pick + 1 < upper_bound && index < NumberPerPage) {
 				NormalLine();
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 				pick++; index++;
 
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
@@ -348,13 +348,13 @@ Vt_Node PickItemVt(Vt_Node root, int& pick, int& CurVtPage, int& TotalVtPage) {
 				CurVtPage--;
 				lower_bound = (CurVtPage - 1) * NumberPerPage;
 				upper_bound = CurVtPage * NumberPerPage;
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
@@ -363,23 +363,23 @@ Vt_Node PickItemVt(Vt_Node root, int& pick, int& CurVtPage, int& TotalVtPage) {
 				CurVtPage++;
 				lower_bound = (CurVtPage - 1) * NumberPerPage;
 				upper_bound = CurVtPage * NumberPerPage;
-				DeleteArrow(index);
+				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeVtManagerPage(root, CurVtPage, TotalVtPage);
 				HighlightLine2();
-				HighLightArrow(index);
+				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
 				ShowVt(VtNodeList[pick]->data, index);
 			}
 			break;
 		case ENTER:
 			NormalLine();
-			DeleteArrow(index);
+			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 			return VtNodeList[pick]; //luu lua chon de thuc hien chuc nang ham Menu
 		case ESC:
 			NormalLine();
-			DeleteArrow(index);
+			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
 			return NULL;
 		}
 	}

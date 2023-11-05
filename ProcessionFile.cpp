@@ -90,7 +90,6 @@ void ReadNVFile(dsNV& ds) {
 				int sl_hd;
 				filein >> sl_hd;
 				filein.ignore();
-				nv->dshd->n_hd = sl_hd;
 				for (int i = 0; i < sl_hd; i++) {
 					hoa_don hd;
 					getline(filein, hd.soHD);
@@ -100,6 +99,12 @@ void ReadNVFile(dsNV& ds) {
 					filein >> hd.loai;
 					AddLastListHD(nv->dshd, hd);
 					
+					hd_Node* hd_node = nv->dshd->head;
+					while (hd_node->next != NULL) {
+						hd_node = hd_node->next;
+					}
+					hd_node->data.dscthd = new ds_chi_tiet_hd;
+
 					int sl_cthd;
 					filein >> sl_cthd;
 					for (int j = 0; j < sl_cthd; j++) {
@@ -109,16 +114,17 @@ void ReadNVFile(dsNV& ds) {
 						filein >> cthd.sl;
 						filein >> cthd.donGia;
 						filein >> cthd.VAT;
-						AddLastCthd(nv->dshd->head->data.dscthd, cthd);
+						AddLastCthd(hd_node->data.dscthd, cthd);
 					}
+					filein.ignore();
 				}
-				filein.ignore();
 			}
 
 			// cap nhat phan tu trong mang con tro
 			ds.dsnv[idx++] = nv;
 			// cap nhat so luong phan tu trong mang
 			ds.n_nv++;
+
 		}
 	}
 	else {

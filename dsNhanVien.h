@@ -39,3 +39,6 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp);
 int PickNVMakeHD(dsNV ds, int CurNVPage, int TotalNVPage);
 void DisplayMenuDSHD(nhan_vien* nv, hd_Node* temp, Vt_Node root, int CurHDPage, int TotalHDPage);
 void MenuManagerHD(dsNV& ds, Vt_Node& root);
+
+void DisplayPrintingHD(nhan_vien* nv, hd_Node* hd, Vt_Node root, int CurCTHDPage, int TotalCTHDPage);
+void CheckingHD(dsNV ds, Vt_Node root);

@@ -8,8 +8,9 @@
 
 int xKeyContentNV[5] = { 12, 30, 65, 100, 113 };
 int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
-int XKeyButton[4] = { 20, 50, 140, 170 };
-int XKeyContentCTHD[6] = { 82, 102, 132, 147, 162, 177 };
+int xKeyContentHD[4] = { 120, 140, 160, 180 };
+int xKeyButton[4] = { 20, 50, 140, 170 };
+int xKeyContentCTHD[7] = { 82, 102, 132, 147, 162, 177, 187 };
 
 string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
@@ -22,8 +23,8 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 
 string ContentNV[4] = { "Ma nhan vien", "              Ho", "             Ten", " Phai" };
 string ContentVT[4] = { "  Ma vat tu", "         Ten vat tu","        Don vi tinh", " SL ton" };
-string ContentHD[4] = { "So hoa don", "Ngay lap", "Ma nhan vien", "Loai" };
-string ContentCTHD[5] = { "    Ma vat tu", "         Ten vat tu", "  So luong", "  Don gia", "   % VAT"};
+string ContentHD[4] = { "So hoa don", "Ngay lap HD", "Loai", "Ma nhan vien" };
+string ContentCTHD[5] = { "Ma vat tu", "Ten vat tu", "So luong", "Don gia", "% VAT"};
 string ButtonFunc[2] = { "    Them vat tu", "  Xac Nhan & Thoat" };
 
 void NormalLine() {
@@ -51,13 +52,13 @@ void DrawColor(int x, int y, int w, int h, int b_color) {
 	}
 }
 
-void HighLightArrow(int pick) {
-	gotoxy(5, Y_Display + 4 + pick * 4);
+void HighLightArrow(int pick, int x, int y) {
+	gotoxy(x, y);
 	cout << char(62) << char(62) << char(62) << char(62);
 }
 
-void DeleteArrow(int pick) {
-	gotoxy(5, Y_Display + 4 + pick * 4);
+void DeleteArrow(int pick, int x, int y) {
+	gotoxy(x, y);
 	cout << "    ";
 }
 
@@ -235,6 +236,7 @@ void Menu() {
 			break;
 		case 4:
 			system("color 0E");
+			CheckingHD(dsnv, dsvt);
 			break;
 		case 5:
 			system("color 0E");
