@@ -54,15 +54,10 @@ void WriteNVToFile(dsNV ds) {
 				}
 				hd = hd->next;
 			}
-			fileout << "\n";
 		}
 	}
 	else {
-		Notification();
-		gotoxy(X_Notification + 2, Y_Notification + 4);
-		cout << "Ket noi file de ghi vao that bai";
-		Sleep(1000);
-		DeleteNotification();
+		Notification("Ket noi file de ghi vao that bai");
 	}
 	fileout.close();
 }
@@ -128,11 +123,7 @@ void ReadNVFile(dsNV& ds) {
 		}
 	}
 	else {
-		Notification();
-		gotoxy(X_Notification + 2, Y_Notification + 4);
-		cout << "Ket noi file de doc vao that bai";
-		Sleep(1000);
-		DeleteNotification();
+		Notification("Ket noi file de doc vao that bai");
 	}
 	filein.close();
 }
@@ -162,11 +153,7 @@ void WriteVtToFile(Vt_Node root) {
 		WriteVtList(root, fileout);
 	}
 	else {
-		Notification();
-		gotoxy(X_Notification + 2, Y_Notification + 4);
-		cout << "Ket noi file de ghi vao that bai";
-		Sleep(1000);
-		DeleteNotification();
+		Notification("Ket noi file de ghi vao that bai");
 	}
 	fileout.close();
 }
@@ -194,11 +181,7 @@ void ReadVtFile(Vt_Node& root) {
 		}
 	}
 	else {
-		Notification();
-		gotoxy(X_Notification + 2, Y_Notification + 4);
-		cout << "Ket noi file de doc vao that bai";
-		Sleep(1000);
-		DeleteNotification();
+		Notification("Ket noi file de doc vao that bai");
 	}
 	filein.close();
 }

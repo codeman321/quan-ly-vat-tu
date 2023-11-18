@@ -14,9 +14,11 @@ extern string ContentHD[4];
 extern string ContentVT[4];
 extern string ContentCTHD[5];
 extern string ButtonFunc[2];
+extern string HDInPeriod[5];
 extern int xKeyButton[4];
 extern int xKeyContentCTHD[6];
 extern int xKeyContentHD[4];
+extern int xKeyContentNV[5];
 
 void Init_hd(hoa_don& hd) {
 	hd.soHD = "";
@@ -103,7 +105,7 @@ hd_Node* FindSoHDExist(ds_hoa_don* dshd, string ID) {
 }
 
 //----------- tinh tri gia -------------
-double ComputeValue(int sl, double donGia, double VAT) {
+int ComputeValue(int sl, double donGia, double VAT) {
 	return (sl * donGia) + ((sl * donGia) * VAT / 100);
 }
 
@@ -329,11 +331,11 @@ void ShowCTHDWithValue(cthd_Node* cthd_temp, Vt_Node root, int pos) {
 	gotoxy(xKeyContentCTHD[2], Y_Display + 3 + pos * 4);
 	cout << cthd_temp->data.sl;
 	gotoxy(xKeyContentCTHD[3], Y_Display + 3 + pos * 4);
-	cout << cthd_temp->data.sl;
+	cout << cthd_temp->data.donGia;
 	gotoxy(xKeyContentCTHD[4], Y_Display + 3 + pos * 4);
-	cout << cthd_temp->data.sl;
+	cout << cthd_temp->data.VAT;
 	gotoxy(xKeyContentCTHD[5], Y_Display + 3 + pos * 4);
-	cout << ComputeValue(cthd_temp->data.sl, cthd_temp->data.sl, cthd_temp->data.sl);
+	cout << addDot(ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT));
 }
 
 //--------- in danh sach chi tiet hoa don trong 1 trang voi tri gia ----------
@@ -497,7 +499,7 @@ void ShowListHDOnePage(ds_hoa_don* dshd, int index, int CurHDPage, int TotalHDPa
 	cout << " Trang " << CurHDPage << "/" << TotalHDPage;
 }
 
-
+//------------ chon hoa don ------------
 hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 	ShowCur(0);
 
@@ -526,7 +528,7 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 	int index = 0;
 	int upper_bound = CurHDPage * NumberPerPage;
 	HighlightLine2();
-	HighLightArrow(index, 115, Y_Display + 4 + pick * 4);
+	HighLightArrow(115, Y_Display + 4 + index * 4);
 	ShowHD(dshdNode[pick]->data, index);
 
 	//--------kiem tra nut len xuong
@@ -540,24 +542,24 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 		case KEY_UP:
 			if (pick > lower_bound && index > 0) {
 				NormalLine();
-				DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+				DeleteArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 				pick--; index--;
 
 				HighlightLine2();
-				HighLightArrow(index, 115, Y_Display + 4 + pick * 4);
+				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 			}
 			break;
 		case KEY_DOWN:
 			if (pick + 1 < sl && pick + 1 < upper_bound && index < NumberPerPage) {
 				NormalLine();
-				DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+				DeleteArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 				pick++; index++;
 
 				HighlightLine2();
-				HighLightArrow(index, 115, Y_Display + 4 + pick * 4);
+				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 			}
 			break;
@@ -566,13 +568,13 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 				CurHDPage--;
 				lower_bound = (CurHDPage - 1) * NumberPerPage;
 				upper_bound = CurHDPage * NumberPerPage;
-				DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+				DeleteArrow(115, Y_Display + 4 + index * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				
 				HighlightLine2();
-				HighLightArrow(index, 115, Y_Display + 4 + pick * 4);
+				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 			}
 			break;
@@ -581,24 +583,25 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 				CurHDPage++;
 				lower_bound = (CurHDPage - 1) * NumberPerPage;
 				upper_bound = CurHDPage * NumberPerPage;
-				DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+				DeleteArrow(115, Y_Display + 4 + index * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				
 				HighlightLine2();
-				HighLightArrow(index, 115, Y_Display + 4 + pick * 4);
+				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 			}
 			break;
 		case ENTER:
 			NormalLine();
-			DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+			DeleteArrow(115, Y_Display + 4 + index * 4);
 			return dshdNode[pick]; //luu lua chon de thuc hien chuc nang ham Menu
 		case ESC:
 			NormalLine();
-			DeleteArrow(index, 115, Y_Display + 4 + pick * 4);
+			DeleteArrow(115, Y_Display + 4 + index * 4);
 			return NULL;
 		}
 	}
 }
+

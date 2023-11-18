@@ -15,6 +15,7 @@ extern string ContentHD[4];
 extern string ContentVT[4];
 extern string ContentCTHD[5];
 extern int xKeyContentCTHD[7];
+extern int xKeyContentNV[5];
 
 //----------- tim chi so cua ma nhan vien ---------
 int FindIndexNV(dsNV ds, string ma) {
@@ -182,11 +183,11 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 
 	//--------highlight dong dang chon--------
 	int lower_bound = (CurNVPage - 1) * NumberPerPage;
-	int pick = lower_bound;
-	int index = 0;
+	int pick = lower_bound; //bien chi so cua mang
+	int index = 0; //bien chi so cua phan tu trong bang
 	int upper_bound = CurNVPage * NumberPerPage;
 	HighlightLine2();
-	HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
+	HighLightArrow(5, Y_Display + 4 + index * 4);
 	ShowNV(ds.dsnv[pick], index);
 
 	//--------kiem tra nut len xuong
@@ -200,24 +201,24 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 		case KEY_UP:
 			if (pick > lower_bound && index > 0) {
 				NormalLine();
-				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+				DeleteArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 				pick--; index--;
 
 				HighlightLine2();
-				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
+				HighLightArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
 		case KEY_DOWN:
 			if (pick + 1 < ds.n_nv && pick + 1 < upper_bound && index < NumberPerPage) {
 				NormalLine();
-				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+				DeleteArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 				pick++; index++;
 
 				HighlightLine2();
-				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
+				HighLightArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
@@ -226,13 +227,13 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 				CurNVPage--;
 				lower_bound = (CurNVPage - 1) * NumberPerPage;
 				upper_bound = CurNVPage * NumberPerPage;
-				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+				DeleteArrow(5, Y_Display + 4 + index * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				HighlightLine2();
-				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
+				HighLightArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
@@ -241,23 +242,23 @@ int PickItemNv(dsNV ds, int CurNVPage, int TotalNVPage) {
 				CurNVPage++;
 				lower_bound = (CurNVPage - 1) * NumberPerPage;
 				upper_bound = CurNVPage * NumberPerPage;
-				DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+				DeleteArrow(5, Y_Display + 4 + index * 4);
 				index = 0;
 				pick = lower_bound;
 				NormalLine();
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				HighlightLine2();
-				HighLightArrow(index, 5, Y_Display + 4 + pick * 4);
+				HighLightArrow(5, Y_Display + 4 + index * 4);
 				ShowNV(ds.dsnv[pick], index);
 			}
 			break;
 		case ENTER:
 			NormalLine();
-			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+			DeleteArrow(5, Y_Display + 4 + index * 4);
 			return pick; //luu lua chon de thuc hien chuc nang ham Menu
 		case ESC:
 			NormalLine();
-			DeleteArrow(index, 5, Y_Display + 4 + pick * 4);
+			DeleteArrow(5, Y_Display + 4 + index * 4);
 			return -1;
 		}
 	}
@@ -275,9 +276,12 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 	string ho_ten;
 	int temp = 0;
 	int step = 1;//cac buoc nhap lieu
+	int cur_step = step;
 	int target = -1;
 	int target2 = -1;
 
+	char signal;
+	
 	while (true) {
 		switch (step) {
 		case 1: //Nhap ma nhan vien
@@ -322,11 +326,7 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 
 				//truong hop nhan vien da lap hoa don 
 				if (ds.dsnv[IndexNv]->used) {
-					Notification();
-					gotoxy(X_Notification + 2, Y_Notification + 4);
-					cout << "Nhan vien da trong hoa don. Khong the xoa!";
-					Sleep(1000);
-					DeleteNotification();
+					Notification("Nhan vien da trong hoa don. Khong the xoa!");
 					ShowNV(ds.dsnv[IndexNv], IndexNv);
 					return;
 				}
@@ -339,64 +339,48 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 					return;
 				}
 				if (!IsDeleteNVSuccess(ds, FindIndexNV(ds, ds.dsnv[IndexNv]->maNV))) {
-					Notification();
-					gotoxy(X_Notification + 2, Y_Notification + 4);
-					cout << "Xoa khong thanh cong!";
-					Sleep(1000);
-					DeleteNotification();
+					Notification("Xoa khong thanh cong!");
 					ShowCur(1);
 				}
 				else {
-					Notification();
-					gotoxy(X_Notification + 2, Y_Notification + 4);
-					cout << "Xoa thanh cong!";
-					Sleep(1000);
-					DeleteNotification();
-					ShowCur(1);
+					Notification("Xoa thanh cong!");
 				}
 				TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				return;
 			}
 
-			TypeWordAndNumber(ID, step, Saved, 10, 5);
+			cur_step = step;
+			TypeWordAndNumber(ID, step, Edited, Saved, 10, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (!Saved) {
 				RemoveFormComplete(3);
 				return;
 			}
 			target = FindIndexNV(ds, ID);
 			if (ID == "") {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Ma nhan vien khong duoc phep rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Ma nhan vien khong duoc phep rong!");
 				break;
 			}
 			//Kiem tra truong hop ma nhan vien da ton tai
 			if (target != -1) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Ma nhan vien da ton tai!";
-				Sleep(1000);
-				DeleteNotification();
+				Notification("Ma nhan vien da ton tai!");
 				ID = "";
 				RemoveForm(1);
-				ShowCur(1);
 				break;
 			}
 			step++;
 			break;
 		case 2: //Nhap ho va ten
-			TypeWordAndSpace(ho_ten, step, Saved, 30, 5);
+			cur_step = step;
+			TypeWordAndSpace(ho_ten, step, Edited, Saved, 30, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (ho_ten == "") {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Ho va ten khong duoc phep rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Ho va ten khong duoc phep rong!");
 				break;
 			}
 			for (int i = ho_ten.length() - 1; i >= 0; i--) {
@@ -410,14 +394,13 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 			step++;
 			break;
 		case 3: //Nhap phai
-			TypeOnlyAWord(nv_phai, step, Saved, 5, 5);
+			cur_step = step;
+			TypeOnlyAWord(nv_phai, step, Edited, Saved, 5, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (nv_phai == "") {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Gioi tinh khong duoc phep rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Gioi tinh khong duoc phep rong!");
 				break;
 			}
 			step++;
@@ -428,15 +411,9 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 				ds.dsnv[target2]->ho = nv_ho;
 				ds.dsnv[target2]->ten = nv_ten;
 				ds.dsnv[target2]->phai = nv_phai;
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Chinh sua thanh cong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Chinh sua thanh cong!");
 				RemoveFormComplete(3);
 				TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
-				CurNVPage = TotalNVPage;
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				return;
 			}
@@ -452,12 +429,8 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 				ds.dsnv[i]->ten = nv_ten;
 				ds.dsnv[i]->phai = nv_phai;
 				ds.n_nv++;
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Them thanh cong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Them thanh cong!");
+				CurNVPage = (FindIndexNV(ds, ds.dsnv[i]->maNV) / NumberPerPage) + 1;
 			}
 			ID = "";
 			nv_ho = "";
@@ -467,7 +440,6 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 			temp = 0;
 			step = 1;
 			TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
-			CurNVPage = TotalNVPage;
 			ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 			RemoveForm(3);
 			break;
@@ -509,12 +481,7 @@ void MenuManageNV(dsNV& ds) {
 				}
 				else if (event == INSERT) {//them moi nhan vien
 					if (ds.n_nv >= Max_NV) {
-						Notification();
-						gotoxy(X_Notification + 2, Y_Notification + 4);
-						cout << "Danh sach nhan vien da day, khong the them!";
-						Sleep(1000);
-						DeleteNotification();
-						ShowCur(1);
+						Notification("Danh sach nhan vien da day, khong the them!");
 						return;
 					}
 					string ContentNV[3] = { "Ma NV", "Ho va Ten", "Phai" };
@@ -524,12 +491,7 @@ void MenuManageNV(dsNV& ds) {
 				}
 				else if (event == DEL) {
 					if (ds.n_nv == 0) {
-						Notification();
-						gotoxy(X_Notification + 2, Y_Notification + 4);
-						cout << "Danh sach rong, khong the xoa";
-						Sleep(1000);
-						DeleteNotification();
-						ShowCur(1);
+						Notification("Danh sach rong, khong the xoa");
 						return;
 					}
 					inputNV(ds, false, true, CurNVPage, TotalNVPage);
@@ -537,12 +499,7 @@ void MenuManageNV(dsNV& ds) {
 				}
 				else if (event == HOME) {
 					if (ds.n_nv == 0) {
-						Notification();
-						gotoxy(X_Notification + 2, Y_Notification + 4);
-						cout << "Danh sach rong, khong the chinh sua";
-						Sleep(1000);
-						DeleteNotification();
-						ShowCur(1);
+						Notification("Danh sach rong, khong the chinh sua");
 						return;
 					}
 					inputNV(ds, true, false, CurNVPage, TotalNVPage);
@@ -562,6 +519,7 @@ int InputHD(nhan_vien*& nv) {
 	hoa_don hd;
 	hd_Node* target;
 	int step = 1;
+	int cur_step = step;
 	
 	while (true) {
 		switch (step) {
@@ -569,57 +527,54 @@ int InputHD(nhan_vien*& nv) {
 			gotoxy(X_Add + 5, Y_Add + 8);
 			cout << nv->maNV;
 
-			TypeWordAndNumber(hd.soHD, step, Saved, 10, 5);
+			cur_step = step;
+			TypeWordAndNumber(hd.soHD, step, false, Saved, 10, 5);
+			if (cur_step != step) {
+				if (step == 0) {
+					step = 1;
+				}
+				break;
+			}
 			if (!Saved) {
 				return 0;
 			}
 			target = FindSoHDExist(nv->dshd, hd.soHD);
 			if (hd.soHD == "") {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "So hoa don khong duoc phep rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("So hoa don khong duoc phep rong!");
 				break;
 			}
 			//Kiem tra truong hop so hoa don da ton tai
 			if (target != NULL) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "So hoa don da ton tai!";
-				Sleep(1000);
+				Notification("So hoa don da ton tai!");
 				DeleteNotification();
 				hd.soHD = "";
 				RemoveForm(1);
-				ShowCur(1);
 				break;
 			}
 			step++;
 			break; }
 		case 2: //Nhap ngay lap hoa don
+			cur_step = step;
 			TypeDate(hd.ngay_lapHD.ngay, step, Saved, 32, 5, 0, 32);
+			if (cur_step != step) {
+				break;
+			}
 			if (hd.ngay_lapHD.ngay == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Ngay lap hoa don khong duoc rong";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Ngay lap hoa don khong duoc rong");
 				break;
 			}
 			step++;
 			break;
 		case 3: { //Nhap thang lap hoa don
 			int temp = step - 1;
+			cur_step = temp;
 			TypeDate(hd.ngay_lapHD.thang, temp, Saved, 13, 15, 0, 13);
+			if (cur_step != temp) {
+				step--;
+				break;
+			}
 			if (hd.ngay_lapHD.thang == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Thang lap hoa don khong duoc rong";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Thang lap hoa don khong duoc rong");
 				break;
 			}
 			step++;
@@ -627,78 +582,19 @@ int InputHD(nhan_vien*& nv) {
 		}
 		case 4: {//Nhap nam lap hoa don
 			int temp = step - 2;
+			cur_step = temp;
 			TypeDate(hd.ngay_lapHD.nam, temp, Saved, 2100, 25, 1000, 2100);
-			if (hd.ngay_lapHD.nam == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Nam lap hoa don khong duoc rong";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+			if (cur_step != temp) {
+				step--;
 				break;
 			}
-			if (hd.ngay_lapHD.thang == 4 || hd.ngay_lapHD.thang == 6 || hd.ngay_lapHD.thang == 9 || hd.ngay_lapHD.thang == 11) {
-				if (hd.ngay_lapHD.ngay >= 31) {
-					Notification();
-					gotoxy(X_Notification + 2, Y_Notification + 4);
-					cout << "Thang 4 | 6 | 9 | 11 chi co 30 ngay";
-					Sleep(1000);
-					DeleteNotification();
-					gotoxy(X_Add + 5, Y_Add + 4);
-					cout << "  ";
-					hd.ngay_lapHD.ngay = 0;
-					gotoxy(X_Add + 15, Y_Add + 4);
-					cout << "  ";
-					hd.ngay_lapHD.thang = 0;
-					gotoxy(X_Add + 25, Y_Add + 4);
-					cout << "    ";
-					hd.ngay_lapHD.nam = 0;
-					step = 2;
-					ShowCur(1);
-					break;
-				}
+			if (hd.ngay_lapHD.nam == 0) {
+				Notification("Nam lap hoa don khong duoc rong");
+				break;
 			}
-			if (hd.ngay_lapHD.thang == 2) {
-				if (hd.ngay_lapHD.nam % 400 == 0 || (hd.ngay_lapHD.nam % 4 == 0 && hd.ngay_lapHD.nam % 100 != 0)) {
-					if (hd.ngay_lapHD.ngay > 29) {
-						Notification();
-						gotoxy(X_Notification + 2, Y_Notification + 4);
-						cout << "Day la nam nhuan, thang 2 chi co 29 ngay";
-						Sleep(1000);
-						DeleteNotification();
-						gotoxy(X_Add + 5, Y_Add + 4);
-						cout << "  ";
-						hd.ngay_lapHD.ngay = 0;
-						gotoxy(X_Add + 15, Y_Add + 4);
-						cout << "  ";
-						hd.ngay_lapHD.thang = 0;
-						gotoxy(X_Add + 25, Y_Add + 4);
-						cout << "    ";
-						hd.ngay_lapHD.nam = 0;
-						step = 2;
-						ShowCur(1);
-						break;
-					}
-				}
-				else if (hd.ngay_lapHD.ngay > 28) {
-					Notification();
-					gotoxy(X_Notification + 2, Y_Notification + 4);
-					cout << "Thang 2 chi co 28 ngay";
-					Sleep(1000);
-					DeleteNotification();
-					gotoxy(X_Add + 5, Y_Add + 4);
-					cout << "  ";
-					hd.ngay_lapHD.ngay = 0;
-					gotoxy(X_Add + 15, Y_Add + 4);
-					cout << "  ";
-					hd.ngay_lapHD.thang = 0;
-					gotoxy(X_Add + 25, Y_Add + 4);
-					cout << "    ";
-					hd.ngay_lapHD.nam = 0;
-					step = 2;
-					ShowCur(1);
-					break;
-				}
+			if (!CheckValidDate(hd.ngay_lapHD, step - 2)) {
+				step = 2;
+				break;
 			}
 			step++;
 			break;
@@ -711,13 +607,8 @@ int InputHD(nhan_vien*& nv) {
 		case 6:
 			AddLastListHD(nv->dshd, hd);
 			nv->used = true;
-			Notification();
-			gotoxy(X_Notification + 2, Y_Notification + 4);
-			cout << "Tao hoa don thanh cong!";
-			Sleep(1000);
-			DeleteNotification();
+			Notification("Tao hoa don thanh cong!");
 			system("cls");
-			ShowCur(1);
 			return 1;
 		}
 	}
@@ -731,6 +622,7 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 	chi_tiet_hd cthd;
 	Vt_Node dsvt_vt = FindVtNode(root, vt->data.ma_vt); //truy cap node vat tu trong danh sach vat tu de cap nhat so luong ton
 	int step = 1;
+	int cur_step = step;
 
 	while (true) {
 		switch (step) {
@@ -747,58 +639,51 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 			step++;
 			break;
 		case 3: //Nhap so luong vat tu
-			TypeOnlyNumber(cthd.sl, step, Saved, 1000000, 5);
+			cur_step = step;
+			TypeOnlyNumber(cthd.sl, step, false, Saved, 1000000, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (!Saved) {
 				return 0;
 			}
 			if (cthd.sl == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "So luong vat tu khong duoc rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("So luong vat tu khong duoc rong!");
 				break;
 			}
 			if (temp->data.loai == 'X' && dsvt_vt->data.sl_ton < cthd.sl) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "So luong ton khong du. Hien chi con " << dsvt_vt->data.sl_ton << " san pham";
-				Sleep(1000);
-				DeleteNotification();
+				string s = "So luong ton khong du. Hien chi con " +  to_string(dsvt_vt->data.sl_ton) + " san pham";
+				Notification(s);
 
 				gotoxy(X_Add + 5, Y_Add + 8);
 				cout << "       ";
 				cthd.sl = 0;
-				ShowCur(1);
 				break;
 			}
 
 			step++;
 			break;
 		case 4: { //Nhap don gia cua vat tu trong cthd
+			cur_step = step;
 			TypeDoubleNumber(cthd.donGia, step, Saved, 1000000.0, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (cthd.donGia == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "Don gia khong duoc rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("Don gia khong duoc rong!");
 				break;
 			}
 			step++;
 			break;
 		}
 		case 5: { //nhap %VAT
+			cur_step = step;
 			TypeDoubleNumber(cthd.VAT, step, Saved, 1000000.0, 5);
+			if (cur_step != step) {
+				break;
+			}
 			if (cthd.VAT == 0) {
-				Notification();
-				gotoxy(X_Notification + 2, Y_Notification + 4);
-				cout << "%VAT khong duoc rong!";
-				Sleep(1000);
-				DeleteNotification();
-				ShowCur(1);
+				Notification("%VAT khong duoc rong!");
 				break;
 			}
 			step++;
@@ -953,8 +838,8 @@ void DisplayPrintingHD(nhan_vien* nv, hd_Node* hd, Vt_Node root, int CurCTHDPage
 		TotalValue += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
 		cthd_temp = cthd_temp->next;
 	}
-	gotoxy(xKeyContentCTHD[5], Y_Display + 43);
-	cout << TotalValue;
+	gotoxy(xKeyContentCTHD[4] + 5, Y_Display + 43);
+	cout << fixed << setprecision(0) << addDot(TotalValue);
 
 }
 
@@ -1021,6 +906,248 @@ void CheckingHD(dsNV ds, Vt_Node root) {
 		case ESC:
 			NormalLine();
 			return;
+		}
+	}
+}
+
+
+//============== cau h: In 10 vat tu co doanh thu cao nhat ==========
+//---------- nhap ngay thang de thong ke ------------
+void InputDateForTopRevenue(date& date1, date& date2) {
+	ShowCur(1);
+	bool Saved = true;
+	int step = 1;
+	int cur_step = step;
+
+	while (true) {
+		switch (step) {
+		case 1:
+			cur_step = step;
+			TypeDate(date1.ngay, step, Saved, 32, 5, 0, 32);
+			if (cur_step != step) {
+				if (step == 0) {
+					step = 1;
+				}
+				break;
+			}
+			if (date1.ngay == 0) {
+				Notification("Ngay thong ke khong duoc rong");
+				break;
+			}
+			step++;
+			break;
+		case 2: {
+			int temp = step - 1;
+			cur_step = temp;
+			TypeDate(date1.thang, temp, Saved, 13, 15, 0, 13);
+			if (cur_step != temp) {
+				step--;
+				break;
+			}
+			if (date1.thang == 0) {
+				Notification("Thang thong ke khong duoc rong");
+				break;
+			}
+			step++;
+			break;
+		}
+		case 3: {
+			int temp = step - 2;
+			cur_step = temp;
+			TypeDate(date1.nam, temp, Saved, 2100, 25, 1000, 2100);
+			if (cur_step != temp) {
+				step--;
+				break;
+			}
+			if (date1.nam == 0) {
+				Notification("Nam thong ke khong duoc rong");
+				break;
+			}
+			if (!CheckValidDate(date1, step - 2)) {
+				step = 1;
+				break;
+			}
+			step++;
+			break;
+		}
+		case 4: {
+			int temp = step - 2;
+			cur_step = temp;
+			TypeDate(date2.ngay, temp, Saved, 32, 5, 0, 32);
+			if (cur_step != temp) {
+				break;
+			}
+			if (date2.ngay == 0) {
+				Notification("Ngay thong ke khong duoc rong");
+				break;
+			}
+			step++;
+			break;
+		}
+		case 5: {
+			int temp = step - 3;
+			cur_step = temp;
+			TypeDate(date2.thang, temp, Saved, 13, 15, 0, 13);
+			if (cur_step != temp) {
+				step--;
+				break;
+			}
+			if (date2.thang == 0) {
+				Notification("Thang thong ke khong duoc rong");
+				break;
+			}
+			step++;
+			break;
+		}
+		case 6: {
+			int temp = step - 4;
+			cur_step = temp;
+			TypeDate(date2.nam, temp, Saved, 2100, 25, 1000, 2100);
+			if (cur_step != temp) {
+				step--;
+				break;
+			}
+			if (date2.nam == 0) {
+				Notification("Nam thong ke khong duoc rong");
+				break;
+			}
+			if (!CheckValidDate(date2, step - 4)) {
+				step = 4;
+				break;
+			}
+			step++;
+			break;
+		}
+		case 7:
+			ShowCur(0);
+			return;
+		}
+	}
+}
+
+//---------- the hien bang thong ke doanh thu ---------
+void DisplayTopRevenue(dsNV ds, Vt_Node root) {
+	DrawTableTopRevenue();
+
+	date date1, date2;
+	InputDateForTopRevenue(date1, date2);
+
+	cthd_with_val** TopRevenue = new cthd_with_val*[Max_itemVt];
+	int idx = 0;
+	for (int i = 0; i < ds.n_nv; i++) {
+		hd_Node* hd_temp = ds.dsnv[i]->dshd->head;
+		for (int j = 0; j < ds.dsnv[i]->dshd->n_hd; j++) {
+			if (hd_temp->data.loai == 'X' && checkPeriod(date1, date2, hd_temp->data.ngay_lapHD)) {
+				cthd_Node* cthd_temp = hd_temp->data.dscthd->head;
+				for (int k = 0; k < hd_temp->data.dscthd->n_cthd; k++) {
+					bool found = false;
+					for (int m = 0; m < idx; m++) {
+						if (TopRevenue[m]->cthd->maVT == cthd_temp->data.maVT) {
+							TopRevenue[m]->revenue += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						TopRevenue[idx] = new cthd_with_val;
+						TopRevenue[idx]->cthd = &cthd_temp->data;
+						TopRevenue[idx]->revenue = ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+						idx++;
+					}
+					cthd_temp = cthd_temp->next;
+				}
+			}
+			hd_temp = hd_temp->next;
+		}
+	}
+	for (int i = 0; i < idx; i++) {
+		for (int j = i + 1; j < idx; j++) {
+			if (TopRevenue[i]->revenue < TopRevenue[j]->revenue) {
+				cthd_with_val* temp = TopRevenue[i];
+				TopRevenue[i] = TopRevenue[j];
+				TopRevenue[j] = temp;
+			}
+		}
+	}
+
+	for (int i = 0; i < 10 && i < idx; i++) {
+		Vt_Node vt = FindVtNode(root, TopRevenue[i]->cthd->maVT);
+		gotoxy(xKeyContentNV[1] + 5, 12 + i * 4);
+		cout << TopRevenue[i]->cthd->maVT;
+		gotoxy(xKeyContentNV[2] + 5, 12 + i * 4);
+		cout << vt->data.ten_vt;
+		gotoxy(xKeyContentNV[3] + 5, 12 + i * 4);
+		cout << addDot(TopRevenue[i]->revenue);
+	}
+	
+	int signal = 0;
+	while (true) {
+		while (_kbhit()) {
+			signal = _getch();
+			if (signal == ESC) {
+				for (int i = 0; i < idx; ++i) {
+					delete TopRevenue[i];
+				}
+				delete[] TopRevenue;
+				return;
+			}
+		}
+	}
+}
+
+
+//============== cau i: Doanh thu cua hang trong 1 nam ===============
+//---------- the hien bang thong ke doanh thu ----------
+void DisplayStatisticRevenue(dsNV ds) {
+	DrawTableStatisticRevenue();
+
+	int year = 0, step = 1;
+	bool Saved = true;
+	while (true) {
+		TypeDate(year, step, Saved, 2100, 10, 1000, 2100);
+
+		if (!Saved) {
+			return;
+		}
+		if (year == 0) {
+			Notification("Nam lap hoa don khong duoc rong");
+		}
+		else {
+			break;
+		}
+	}
+
+	gotoxy(X_Display + 68, Y_Display - 3);
+	cout << year;
+
+	int TotalRevenueList[13] = {0};
+	for (int i = 0; i < ds.n_nv; i++) {
+		hd_Node* hd_temp = ds.dsnv[i]->dshd->head;
+		for (int j = 0; j < ds.dsnv[i]->dshd->n_hd; j++) {
+			if (hd_temp->data.ngay_lapHD.nam == year && hd_temp->data.loai == 'X') {
+				cthd_Node* cthd_temp = hd_temp->data.dscthd->head;
+				for (int k = 0; k < hd_temp->data.dscthd->n_cthd; k++) {
+					TotalRevenueList[hd_temp->data.ngay_lapHD.thang] += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+					cthd_temp = cthd_temp->next;
+				}
+			}
+			hd_temp = hd_temp->next;
+		}
+	}
+
+	ShowCur(0);
+	for (int i = 1; i <= 12; i++) {
+		gotoxy(X_Display + 72, 10 + (i - 1) * 4);
+		cout << fixed << setprecision(0) << addDot(TotalRevenueList[i]);
+	}
+	
+	int signal = 0;
+	while (true) {
+		while (_kbhit()) {
+			signal = _getch();
+			if (signal == ESC) {
+				return;
+			}
 		}
 	}
 }

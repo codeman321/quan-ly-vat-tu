@@ -16,16 +16,20 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
 							   "Lap hoa don nhap/xuat",
 							   "In hoa don",
-							   "Thong ke hoa don",
+							   "Thong ke hoa don trong 1 khoang thoi gian",
 							   "In 10 vat tu co doanh thu cao nhat",
-							   "Thong ke doanh thu trong 1 nam",
+							   "Thong ke doanh thu cua hang trong 1 nam",
 							   "Thoat" };
 
 string ContentNV[4] = { "Ma nhan vien", "              Ho", "             Ten", " Phai" };
 string ContentVT[4] = { "  Ma vat tu", "         Ten vat tu","        Don vi tinh", " SL ton" };
-string ContentHD[4] = { "So hoa don", "Ngay lap HD", "Loai", "Ma nhan vien" };
+string ContentHD[4] = { "So hoa don", "Ngay lap HD", "Ma nhan vien", "Loai" };
 string ContentCTHD[5] = { "Ma vat tu", "Ten vat tu", "So luong", "Don gia", "% VAT"};
 string ButtonFunc[2] = { "    Them vat tu", "  Xac Nhan & Thoat" };
+string HDInPeriod[5] = {"So hoa don", "Ngay lap", "Loai HD", "Ho ten nhan vien", "Tri gia"};
+string StatisticRevenue[1] = { "Nhap nam thong ke" };
+string TopRevenue[2] = { "Tu ngay", "Den ngay" };
+string ContentTopRevenue[4] = { "Top", "Ma vat tu", "Ten vat tu", "Doanh thu"};
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -52,12 +56,12 @@ void DrawColor(int x, int y, int w, int h, int b_color) {
 	}
 }
 
-void HighLightArrow(int pick, int x, int y) {
+void HighLightArrow(int x, int y) {
 	gotoxy(x, y);
 	cout << char(62) << char(62) << char(62) << char(62);
 }
 
-void DeleteArrow(int pick, int x, int y) {
+void DeleteArrow(int x, int y) {
 	gotoxy(x, y);
 	cout << "    ";
 }
@@ -243,9 +247,11 @@ void Menu() {
 			break;
 		case 6:
 			system("color 0E");
+			DisplayTopRevenue(dsnv, dsvt);
 			break;
 		case 7:
 			system("color 0E");
+			DisplayStatisticRevenue(dsnv);
 			break;
 		case Max_item:
 			system("color 0E");
@@ -388,7 +394,7 @@ void RemoveForm(int sl) {
 //========== End: Bang xoa thong tin ===========
 
 //---------- Ve bang thong bao -----------
-void Notification() {
+void Notification(string nd) {
 	//SetColor(6);
 	ShowCur(0);
 	gotoxy(X_Notification + 20, Y_Notification);
@@ -427,6 +433,12 @@ void Notification() {
 	cout << char(187);
 	gotoxy(X_Notification + 50, Y_Notification + 6);
 	cout << char(188);
+
+	gotoxy(X_Notification + 2, Y_Notification + 4);
+	cout << nd;
+	Sleep(1000);
+	DeleteNotification();
+	ShowCur(1);
 }
 
 //------------ xoa bang thong bao -----------
@@ -592,7 +604,7 @@ int PrintOrUpdate(int index) {
 	system("color 0E");
 	for (int i = 15; i <= 48; i++) {
 		gotoxy(X_Menu + 2, i);
-		cout << left << setw(45) << " ";
+		cout << left << setw(47) << " ";
 	}
 	string ListChoice[4] = {"Cap nhat vat tu", "In danh sach vat tu", "Cap nhat nhan vien", "In danh sach nhan vien"};
 	int RowListChoice[4] = {25, 39, 25, 39};
@@ -647,3 +659,103 @@ int PrintOrUpdate(int index) {
 	}
 }
 
+//---------------- bang in thong ke doanh thu cua hang trong 1 nam ------------
+void DrawTableStatisticRevenue() {
+	system("cls");
+	CreateInputForm(StatisticRevenue, 1, 50);
+
+	gotoxy(X_Display + 40, Y_Display - 3);
+	cout << "BANG THONG KE DOANH THU NAM";
+	gotoxy(X_Display + 35, Y_Display);
+	cout << "THANG";
+	gotoxy(X_Display + 70, Y_Display);
+	cout << "DOANH THU";
+	for (int i = 1; i <= 12; i++) {
+		gotoxy(X_Display + 37, 10 + (i - 1) * 4);
+		cout << i;
+	}
+
+	for (int ix = X_Display + 20; ix <= X_Display + 90; ix++) {
+		gotoxy(ix, Y_Display - 5);
+		cout << char(220);
+
+		gotoxy(ix, Y_Display - 1);
+		cout << char(220);
+
+		gotoxy(ix, Y_Display + 1);
+		cout << char(220);
+
+		gotoxy(ix, Y_Display + 48);
+		cout << char(220);
+	}
+
+	for (int iy = Y_Display - 4; iy <= Y_Display + 48; iy++) {
+		gotoxy(X_Display + 20, iy);
+		cout << char(219);
+
+		gotoxy(X_Display + 90, iy);
+		cout << char(219);
+	}
+
+	for (int iy = Y_Display; iy <= Y_Display + 48; iy++) {
+		gotoxy(X_Display + 55, iy);
+		cout << char(219);
+	}
+}
+
+//---------------- ve bang in doanh thu cao nhat cua 10 vat tu ------------
+void DrawTableTopRevenue() {
+	system("cls");
+	CreateInputForm(TopRevenue, 2, 50);
+
+	gotoxy(X_Display + 31, Y_Display - 4);
+	cout << "BANG THONG KE 10 VAT TU CO DOANH THU CAO NHAT";
+
+	for (int i = 0; i < 4; i++) {
+		gotoxy(xKeyContentNV[i] + 3, Y_Display);
+		cout << ContentTopRevenue[i];
+	}
+	for (int i = 1; i <= 10; i++) {
+		gotoxy(xKeyContentNV[0] + 9, 12 + (i - 1) * 4);
+		cout << i;
+	}
+
+	for (int i = 0; i < 2; i++) {
+		gotoxy(X_InputForm + 20, Y_Display + i * 4);
+		cout << " / ";
+
+		gotoxy(X_InputForm + 30, Y_Display + i * 4);
+		cout << " / ";
+	}
+
+	for (int iy = Y_Display - 2; iy <= Y_Display + 45; iy++) {
+		for (int i = 0; i < 5; i++) {
+			gotoxy(xKeyContentNV[i], iy);
+			cout << char(219);
+		}
+	}
+
+	//ve thanh ngang ben tren va duoi
+	for (int ix = xKeyContentNV[0]; ix <= xKeyContentNV[4]; ix++) {
+		//ve thanh ngang ben tren so 1
+		gotoxy(ix, Y_Display - 2);
+		cout << char(220);
+
+		// ve thanh ngang ben tren so 2
+		gotoxy(ix, Y_Display + 2);
+		cout << char(220);
+
+		//ve thanh ngang ben duoi
+		gotoxy(ix, Y_Display + 45);
+		cout << char(220);
+	}
+
+	//dieu chinh goc
+	for (int i = 0; i < 5; i++) {
+		gotoxy(xKeyContentNV[i], Y_Display + 2);
+		cout << char(219);
+
+		gotoxy(xKeyContentNV[i], Y_Display + 45);
+		cout << char(219);
+	}
+}
