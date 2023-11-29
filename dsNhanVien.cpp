@@ -14,8 +14,10 @@ extern string ContentNV[4];
 extern string ContentHD[4];
 extern string ContentVT[4];
 extern string ContentCTHD[5];
+extern string ContentTK[6];
 extern int xKeyContentCTHD[7];
 extern int xKeyContentNV[5];
+extern int xKeyContentTK[8];
 
 //----------- tim chi so cua ma nhan vien ---------
 int FindIndexNV(dsNV ds, string ma) {
@@ -901,6 +903,244 @@ void CheckingHD(dsNV ds, Vt_Node root) {
 			if (CurCTHDPage < TotalCTHDPage) {
 				CurCTHDPage++;
 				ShowListCTHDOnePageWithValue(hd, root, (CurCTHDPage - 1) * NumberPerPage, CurCTHDPage, TotalCTHDPage);
+			}
+			break;
+		case ESC:
+			NormalLine();
+			return;
+		}
+	}
+}
+
+
+//============== cau g: In hoa don trong khoang thoi gian ==========
+//---------- the hien bang thong ke ----------
+void DisplayTK(string ct[], int sl, bool used) {
+	//show key - the hien ra noi dung cua cac cot
+	for (int i = 0; i < sl; i++) {
+		gotoxy(xKeyContentTK[i] + 3, Y_Display);
+		cout << ct[i];
+	}
+
+	//ve cac duong thang de phan chia cac cot
+	for (int iy = Y_Display - 2; iy <= Y_Display + 45; iy++) {
+		for (int i = 0; i < sl + 1; i++) {
+			gotoxy(xKeyContentTK[i], iy);
+			cout << char(219);
+		}
+	}
+
+	//ve thanh ngang ben tren va duoi
+	for (int ix = xKeyContentTK[0]; ix <= xKeyContentTK[sl]; ix++) {
+		//ve thanh ngang ben tren so 1
+		gotoxy(ix, Y_Display - 2);
+		cout << char(220);
+
+		// ve thanh ngang ben tren so 2
+		gotoxy(ix, Y_Display + 2);
+		cout << char(220);
+
+		//ve thanh ngang ben duoi
+		gotoxy(ix, Y_Display + 45);
+		cout << char(220);
+	}
+
+	//dieu chinh goc
+	for (int i = 0; i < 7; i++) {
+		gotoxy(xKeyContentTK[i], Y_Display + 2);
+		cout << char(219);
+
+		gotoxy(xKeyContentTK[i], Y_Display + 45);
+		cout << char(219);
+	}
+}
+ 
+//---------- in 1 thong tin -------------
+void ShowHDTK(hoa_donTK  hdtk, int pos) {
+	gotoxy(xKeyContentTK[0] + 3, Y_Display + 4 + pos * 4);
+	cout << left << setw(15) << hdtk.maNV;
+	gotoxy(xKeyContentTK[1] + 3, Y_Display + 4 + pos * 4);
+	cout << left << setw(25) << hdtk.ho;
+	gotoxy(xKeyContentTK[2] + 3, Y_Display + 4 + pos * 4);
+	cout << left << setw(25) << hdtk.ten;
+	gotoxy(xKeyContentTK[3] + 3, Y_Display + 4 + pos * 4);
+	cout << left << setw(5) << hdtk.soHD;
+	gotoxy(xKeyContentTK[4] + 3, Y_Display + 4 + pos * 4);
+	cout << left << setw(5) << StandardDate(hdtk.ngay_lapHD.ngay, hdtk.ngay_lapHD.thang, hdtk.ngay_lapHD.nam);
+	gotoxy(xKeyContentTK[5] + 3, Y_Display + 4 + pos * 4);
+	(hdtk.loai == 'N') ? cout << "Nhap" : cout << "Xuat";
+}
+
+//---------- in 1 trang -----------
+void ShowListHDTKOnePage(ds_hoa_donTK* HdTkNodeList, int index, int CurHDPage, int TotalHDPage, date ngay1, date ngay2) {
+	int i = 0;
+
+	for (int j = i; j < NumberPerPage; j++) {
+		for (int k = 0; k < 3; k++) {
+			for (int l = xKeyContentTK[k] + 2; l < xKeyContentTK[k + 1] - 2; l++) {
+				gotoxy(l, Y_Display + 4 + j * 4);
+				cout << " ";
+			}
+		}
+	}
+
+	hoa_donTK_Node* hdtk_temp = HdTkNodeList->head;
+	for (int i = 0; i < index && i < HdTkNodeList->n_hdtk; i++) {
+		hdtk_temp = hdtk_temp->next;
+	}
+	for (i = 0; i + index < HdTkNodeList->n_hdtk && i < NumberPerPage; i++) {
+		ShowHDTK(hdtk_temp->data, i);
+		hdtk_temp = hdtk_temp->next;
+	}
+	gotoxy(X_Page, Y_Page);
+	cout << " Trang " << CurHDPage << "/" << TotalHDPage;
+}
+
+//---------- them nhung hoa don hop le vao mang dstk ------------
+void CheckNgayNV(dsNV& ds, date ngay1, date ngay2, int i, ds_hoa_donTK*& dstk) {
+	hd_Node* temp = ds.dsnv[i]->dshd->head;
+
+	while (temp != NULL) {
+		if (checkPeriod(ngay1, ngay2, temp->data.ngay_lapHD)) {
+			hoa_donTK_Node* newHDTKNode = MakeHdTkNode(temp->data, ds.dsnv[i]->ho, ds.dsnv[i]->ten, ds.dsnv[i]->maNV);
+			if (dstk->head == NULL) {
+				dstk->head = newHDTKNode;
+			}
+			else {
+				hoa_donTK_Node* lastNode = dstk->head;
+				while (lastNode->next != NULL) {
+					lastNode = lastNode->next;
+				}
+
+				// Them node moi
+				lastNode->next = newHDTKNode;
+			}
+			dstk->n_hdtk++;
+		}
+		temp = temp->next;
+	}
+}
+
+//--------- menu the hien thong tin cac hoa don hop le --------------
+void ThongKeHD(dsNV ds) {
+	system("cls");
+
+	date ngay1, ngay2;
+	DisplayTK(ContentTK, sizeof(ContentTK) / sizeof(string), false);
+
+	gotoxy(40, 2);
+	cout << "BANG LIET KE CAC HOA DON TRONG KHOANG THOI GIAN";
+	gotoxy(46, 3);
+	cout << "Tu ngay ##/##/#### Den ngay ##/##/####";
+	gotoxy(55, 3);
+	ShowCur(1);
+
+	ds_hoa_donTK* dstk = new ds_hoa_donTK; // Allocate memory for dstk
+	dstk->head = NULL; // Initialize head to NULL
+	dstk->n_hdtk = 0; // Initialize the node count
+
+	bool Saved = true;
+	int event;
+	int CurX;
+	int step = 1;
+	int stepy = 0;
+	while (true)
+	{
+
+		switch (step) {
+		case 1: {
+			TypeDate(ngay1.ngay, stepy, Saved, 32, -96, 0, 32);
+			if (!Saved) {
+				return;
+			}
+			if (ngay1.ngay == 0) {
+				break;
+			}
+			step++;
+			break; }
+		case 2: 
+			CurX = wherex();
+			gotoxy(CurX + 1, 3);
+			TypeDate(ngay1.thang, stepy, Saved, 13, -93, 0, 13);
+			if (ngay1.thang == 0) {
+				break;
+			}
+			step++;
+			break;
+		case 3: { 
+			CurX = wherex();
+			gotoxy(CurX + 1, 3);
+			TypeDate(ngay1.nam, stepy, Saved, 2100, -90, 1000, 2100);
+			if (ngay1.nam == 0) {
+				break;
+			}
+			step++;
+			break;
+		}
+		case 4: {
+			gotoxy(75, 3);
+			ShowCur(1);
+			TypeDate(ngay2.ngay, stepy, Saved, 32, -76, 0, 32);
+			if (ngay2.ngay == 0) {
+				break;
+			}
+			step++;
+			break;
+		}
+		case 5: {
+			CurX = wherex();
+			gotoxy(CurX + 1, 3);
+			TypeDate(ngay2.thang, stepy, Saved, 13, -73, 0, 13);
+			if (ngay2.thang == 0) {
+				break;
+			}
+			step++;
+			break;
+		}
+		case 6:
+			CurX = wherex();
+			gotoxy(CurX + 1, 3);
+			TypeDate(ngay2.nam, stepy, Saved, 2100, -70, 1000, 2100);
+			if (ngay2.nam == 0) {
+				break;
+			}
+
+
+			//step++;
+			break;
+		}
+		if (ngay1.ngay != 0 && ngay1.thang != 0 && ngay1.nam != 0 &&
+			ngay2.ngay != 0 && ngay2.thang != 0 && ngay2.nam != 0) {
+			break; // Exit the loop if all conditions are met
+		}
+		ShowCur(0);
+	}
+
+	for (int i = 0; i < ds.n_nv; i++) {
+		CheckNgayNV(ds, ngay1, ngay2, i, dstk);
+	}
+
+	int CurHDPage = 1;
+	int TotalHDPage = (int)ceil((double)dstk->n_hdtk / NumberPerPage);
+	ShowListHDTKOnePage(dstk, 0, CurHDPage, TotalHDPage, ngay1, ngay2);
+
+	char signal;
+	while (true) {
+		signal = _getch(); //kiem tra co nhap gi tu ban phim khong
+		if (signal == -32) {
+			signal = _getch();
+		}
+		switch (signal) {
+		case PAGE_UP:
+			if (CurHDPage > 1) {
+				CurHDPage--;
+				ShowListHDTKOnePage(dstk, 0, (CurHDPage - 1) * NumberPerPage, TotalHDPage, ngay1, ngay2);
+			}
+			break;
+		case PAGE_DOWN:
+			if (CurHDPage < TotalHDPage) {
+				CurHDPage++;
+				ShowListHDTKOnePage(dstk, 0, (CurHDPage - 1) * NumberPerPage, TotalHDPage, ngay1, ngay2);
 			}
 			break;
 		case ESC:

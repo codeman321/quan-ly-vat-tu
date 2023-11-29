@@ -258,6 +258,10 @@ void TypeDate(int& result, int& step, bool& Saved, int LimitReach, int distance,
 				else if (signal == ENTER) {
 					if (result > LimitReach || result == 0 || min >= result || result >= max)
 						continue;
+					if (result >= 1 && result <= 9) {
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "0" << result;
+					}
 					return;
 				}
 			}
@@ -416,14 +420,14 @@ bool CheckValidDate(date& date1, int step) {
 }
 
 bool checkPeriod(date d1, date d2, date d3) {
-	if (d1.nam > d3.nam || d3.nam > d2.nam) {
+	int entryDate = (d3.nam * 10000) + (d3.thang * 100) + d3.ngay;
+	int startDate = (d1.nam * 10000) + (d1.thang * 100) + d1.ngay;
+	int endDate = (d2.nam * 10000) + (d2.thang * 100) + d2.ngay;
+
+	if (entryDate >= startDate && entryDate <= endDate) {
+		return true;
+	}
+	else {
 		return false;
 	}
-	if (d1.thang > d3.thang || d3.thang > d2.thang) {
-		return false;
-	}
-	if (d1.ngay > d3.ngay || d3.ngay > d2.ngay) {
-		return false;
-	}
-	return true;
 }

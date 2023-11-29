@@ -36,6 +36,21 @@ hd_Node* MakeHdNode(hoa_don data) {
 	return temp;
 }
 
+hoa_donTK_Node* MakeHdTkNode(hoa_don data, string maNV, string ho, string ten) {
+	hoa_donTK_Node* temp = new hoa_donTK_Node;
+
+	// Map data from hoa_don to hoa_donTK
+	temp->data.soHD = data.soHD;
+	temp->data.ngay_lapHD = data.ngay_lapHD;
+	temp->data.loai = data.loai;
+	temp->data.ho = ho;
+	temp->data.ten = ten;
+	temp->data.maNV = maNV;
+
+	temp->next = NULL;
+	return temp;
+}
+
 //---------- them vao cuoi danh sach -----------
 void AddLastListHD(ds_hoa_don*& dshd, hoa_don hd) {
 	hd_Node* newNode = MakeHdNode(hd);

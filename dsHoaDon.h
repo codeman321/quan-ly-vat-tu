@@ -29,6 +29,25 @@ struct ds_hoa_don {
 	int n_hd = 0;
 };
 
+struct hoa_donTK {
+	string soHD;
+	date ngay_lapHD;
+	char loai;
+	string maNV;
+	string ho;
+	string ten;
+};
+
+struct hoa_donTK_Node {
+	hoa_donTK data;
+	hoa_donTK_Node* next;
+
+};
+
+struct ds_hoa_donTK {
+	hoa_donTK_Node* head = NULL;
+	int n_hdtk = 0;
+};
 
 void Init_hd(hoa_don& hd);
 hd_Node* MakeHdNode(hoa_don data);
@@ -49,3 +68,4 @@ void DrawTablePickHD();
 void ShowHD(hoa_don hd, int pos);
 void ShowListHDOnePage(ds_hoa_don* dshd, int index, int CurHDPage, int TotalHDPage);
 hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage);
+hoa_donTK_Node* MakeHdTkNode(hoa_don data, string maNV, string ho, string ten);

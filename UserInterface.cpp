@@ -11,6 +11,7 @@ int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
 int xKeyContentHD[4] = { 120, 140, 160, 180 };
 int xKeyButton[4] = { 20, 50, 140, 170 };
 int xKeyContentCTHD[7] = { 82, 102, 132, 147, 162, 177, 187 };
+int xKeyContentTK[8] = { 12, 30, 65, 100, 120, 140, 160, 180 };
 
 string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
@@ -24,12 +25,14 @@ string menu_func[Max_item] = { "Danh sach vat tu",
 string ContentNV[4] = { "Ma nhan vien", "              Ho", "             Ten", " Phai" };
 string ContentVT[4] = { "  Ma vat tu", "         Ten vat tu","        Don vi tinh", " SL ton" };
 string ContentHD[4] = { "So hoa don", "Ngay lap HD", "Ma nhan vien", "Loai" };
-string ContentCTHD[5] = { "Ma vat tu", "Ten vat tu", "So luong", "Don gia", "% VAT"};
+string ContentCTHD[5] = { "Ma vat tu", "Ten vat tu", "So luong", "Don gia", "% VAT" };
 string ButtonFunc[2] = { "    Them vat tu", "  Xac Nhan & Thoat" };
-string HDInPeriod[5] = {"So hoa don", "Ngay lap", "Loai HD", "Ho ten nhan vien", "Tri gia"};
+string HDInPeriod[5] = { "So hoa don", "Ngay lap", "Loai HD", "Ho ten nhan vien", "Tri gia" };
 string StatisticRevenue[1] = { "Nhap nam thong ke" };
 string TopRevenue[2] = { "Tu ngay", "Den ngay" };
-string ContentTopRevenue[4] = { "Top", "Ma vat tu", "Ten vat tu", "Doanh thu"};
+string ContentTopRevenue[4] = { "Top", "Ma vat tu", "Ten vat tu", "Doanh thu" };
+string ContentTK[6] = { "Ma nhan vien", "              Ho", "             Ten", "   So hoa don", "  Ngay lap HD", "     Loai" };
+
 
 void NormalLine() {
 	SetColor(14);// yellow
@@ -244,6 +247,7 @@ void Menu() {
 			break;
 		case 5:
 			system("color 0E");
+			ThongKeHD(dsnv);
 			break;
 		case 6:
 			system("color 0E");

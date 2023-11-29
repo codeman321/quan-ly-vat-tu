@@ -73,6 +73,9 @@
 #define X_Notification 140
 #define Y_Notification 40
 
+#define X_NotificationTK 180
+#define Y_NotificationTK 7
+
 // Board Menu - bang liet ke ra danh sach
 #define X_Display 10
 #define Y_Display 7

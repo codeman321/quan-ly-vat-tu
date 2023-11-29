@@ -40,6 +40,12 @@ int PickNVMakeHD(dsNV ds, int CurNVPage, int TotalNVPage);
 void DisplayMenuDSHD(nhan_vien* nv, hd_Node* temp, Vt_Node root, int CurHDPage, int TotalHDPage);
 void MenuManagerHD(dsNV& ds, Vt_Node& root);
 
+void DisplayTK(string ct[], int sl, bool used);
+void ShowHDTK(hoa_donTK  hdtk, int pos);
+void ShowListHDTKOnePage(ds_hoa_donTK* HdTkNodeList, int index, int CurHDPage, int TotalHDPage, date ngay1, date ngay2);
+void CheckNgayNV(dsNV& ds, date ngay1, date ngay2, int i, ds_hoa_donTK*& dstk);
+void ThongKeHD(dsNV ds);
+
 void DisplayPrintingHD(nhan_vien* nv, hd_Node* hd, Vt_Node root, int CurCTHDPage, int TotalCTHDPage);
 void CheckingHD(dsNV ds, Vt_Node root);
 

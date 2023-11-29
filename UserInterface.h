@@ -21,7 +21,6 @@ void DrawRemoveTable();
 int RemoveConfirm();
 void RemoveFormComplete(int sl);
 void RemoveForm(int sl);
-void Notification(string nd);
 void DeleteNotification();
 void Display(string ct[], int sl, bool used);
 void DisplayForWatch(string ct[], int num_row, int num_item);
