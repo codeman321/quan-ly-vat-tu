@@ -655,7 +655,7 @@ int PrintOrUpdate(int index) {
 			}
 			break;
 		case ESC:
-			return 0;
+			return -1;
 		case ENTER:
 			NormalLine();
 			return pick; //luu lua chon de thuc hien chuc nang 

@@ -200,10 +200,6 @@ void TypeWordAndNumber(string& result, int& step, bool Edited, bool& Saved, int 
 					//Cap nhat do dai chuoi
 					cnt--;
 				}
-				else if (event == KEY_UP) {
-					step--;
-					return;
-				}
 			}
 		}
 	}

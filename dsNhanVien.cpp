@@ -336,8 +336,10 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 				target = RemoveConfirm();
 				RemoveFormComplete(1);
 				if (target == 2) {
+					int idx = IndexNv;
 					NormalLine();
-					ShowNV(ds.dsnv[IndexNv], IndexNv);
+					IndexNv = IndexNv % 10;
+					ShowNV(ds.dsnv[idx], IndexNv);
 					return;
 				}
 				if (!IsDeleteNVSuccess(ds, FindIndexNV(ds, ds.dsnv[IndexNv]->maNV))) {
@@ -415,7 +417,6 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 				ds.dsnv[target2]->phai = nv_phai;
 				Notification("Chinh sua thanh cong!");
 				RemoveFormComplete(3);
-				TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
 				ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				return;
 			}
@@ -879,6 +880,9 @@ void CheckingHD(dsNV ds, Vt_Node root) {
 	DrawTablePickHD();
 	ShowListHDOnePage(ds_temp.dsnv[pick]->dshd, 0, CurHDPage, TotalHDPage);
 	hd_Node* hd = PickHD(ds_temp.dsnv[pick]->dshd, CurHDPage, TotalHDPage);
+	if (hd == NULL) {
+		return;
+	}
 
 	//in hoa don
 	int CurCTHDPage = 1;
@@ -956,7 +960,7 @@ void DisplayTK(string ct[], int sl, bool used) {
 }
  
 //---------- in 1 thong tin -------------
-void ShowHDTK(hoa_donTK  hdtk, int pos) {
+void ShowHDTK(hoa_donTK hdtk, int pos) {
 	gotoxy(xKeyContentTK[0] + 3, Y_Display + 4 + pos * 4);
 	cout << left << setw(15) << hdtk.maNV;
 	gotoxy(xKeyContentTK[1] + 3, Y_Display + 4 + pos * 4);
@@ -1002,7 +1006,7 @@ void CheckNgayNV(dsNV& ds, date ngay1, date ngay2, int i, ds_hoa_donTK*& dstk) {
 
 	while (temp != NULL) {
 		if (checkPeriod(ngay1, ngay2, temp->data.ngay_lapHD)) {
-			hoa_donTK_Node* newHDTKNode = MakeHdTkNode(temp->data, ds.dsnv[i]->ho, ds.dsnv[i]->ten, ds.dsnv[i]->maNV);
+			hoa_donTK_Node* newHDTKNode = MakeHdTkNode(temp->data, ds.dsnv[i]->maNV, ds.dsnv[i]->ho, ds.dsnv[i]->ten);
 			if (dstk->head == NULL) {
 				dstk->head = newHDTKNode;
 			}
@@ -1104,9 +1108,6 @@ void ThongKeHD(dsNV ds) {
 			if (ngay2.nam == 0) {
 				break;
 			}
-
-
-			//step++;
 			break;
 		}
 		if (ngay1.ngay != 0 && ngay1.thang != 0 && ngay1.nam != 0 &&
@@ -1153,9 +1154,8 @@ void ThongKeHD(dsNV ds) {
 
 //============== cau h: In 10 vat tu co doanh thu cao nhat ==========
 //---------- nhap ngay thang de thong ke ------------
-void InputDateForTopRevenue(date& date1, date& date2) {
+void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 	ShowCur(1);
-	bool Saved = true;
 	int step = 1;
 	int cur_step = step;
 
@@ -1164,6 +1164,9 @@ void InputDateForTopRevenue(date& date1, date& date2) {
 		case 1:
 			cur_step = step;
 			TypeDate(date1.ngay, step, Saved, 32, 5, 0, 32);
+			if (!Saved) {
+				return;
+			}
 			if (cur_step != step) {
 				if (step == 0) {
 					step = 1;
@@ -1270,7 +1273,11 @@ void DisplayTopRevenue(dsNV ds, Vt_Node root) {
 	DrawTableTopRevenue();
 
 	date date1, date2;
-	InputDateForTopRevenue(date1, date2);
+	bool Saved = true;
+	InputDateForTopRevenue(date1, date2, Saved);
+	if (!Saved) {
+		return;
+	}
 
 	cthd_with_val** TopRevenue = new cthd_with_val*[Max_itemVt];
 	int idx = 0;

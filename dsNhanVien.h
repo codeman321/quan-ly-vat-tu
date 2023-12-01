@@ -49,7 +49,7 @@ void ThongKeHD(dsNV ds);
 void DisplayPrintingHD(nhan_vien* nv, hd_Node* hd, Vt_Node root, int CurCTHDPage, int TotalCTHDPage);
 void CheckingHD(dsNV ds, Vt_Node root);
 
-void InputDateForTopRevenue(date& date1, date& date2);
+void InputDateForTopRevenue(date& date1, date& date2, bool& Saved);
 void DisplayTopRevenue(dsNV ds, Vt_Node root);
 
 void DisplayStatisticRevenue(dsNV ds);
