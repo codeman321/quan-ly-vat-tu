@@ -11,7 +11,7 @@ int xKeyContentVT[5] = { 12, 30, 65, 100, 113 };
 int xKeyContentHD[4] = { 120, 140, 160, 180 };
 int xKeyButton[4] = { 20, 50, 140, 170 };
 int xKeyContentCTHD[7] = { 82, 102, 132, 147, 162, 177, 187 };
-int xKeyContentTK[8] = { 12, 30, 65, 100, 120, 140, 160, 180 };
+int xKeyContentTK[8] = { 12, 30, 65, 85, 100, 120, 130, 150 };
 
 string menu_func[Max_item] = { "Danh sach vat tu",
 							   "Danh sach nhan vien",
@@ -31,7 +31,7 @@ string HDInPeriod[5] = { "So hoa don", "Ngay lap", "Loai HD", "Ho ten nhan vien"
 string StatisticRevenue[1] = { "Nhap nam thong ke" };
 string TopRevenue[2] = { "Tu ngay", "Den ngay" };
 string ContentTopRevenue[4] = { "Top", "Ma vat tu", "Ten vat tu", "Doanh thu" };
-string ContentTK[6] = { "Ma nhan vien", "              Ho", "             Ten", "   So hoa don", "  Ngay lap HD", "     Loai" };
+string ContentTK[6] = { "Ma nhan vien", "              Ho", "      Ten", "So hoa don", "  Ngay lap HD", "Loai" };
 
 
 void NormalLine() {
@@ -440,7 +440,7 @@ void Notification(string nd) {
 
 	gotoxy(X_Notification + 2, Y_Notification + 4);
 	cout << nd;
-	Sleep(1000);
+	Sleep(2000);
 	DeleteNotification();
 	ShowCur(1);
 }
@@ -547,6 +547,19 @@ void RemoveExceedMember(int cnt, int sl) {
 		for (int i = cnt; i < NumberPerPage; i++) {
 			for (int j = 0; j < sl; j++) {
 				for (int k = xKeyContentNV[j] + 3; k < xKeyContentNV[j + 1]; k++) {
+					gotoxy(k, Y_Display + 4 + i * 4);
+					cout << " ";
+				}
+			}
+		}
+	}
+}
+
+void RemoveExceedMemberTK(int cnt, int sl) {
+	if (cnt < NumberPerPage) {
+		for (int i = cnt; i < NumberPerPage; i++) {
+			for (int j = 0; j < sl; j++) {
+				for (int k = xKeyContentTK[j] + 3; k < xKeyContentTK[j + 1]; k++) {
 					gotoxy(k, Y_Display + 4 + i * 4);
 					cout << " ";
 				}

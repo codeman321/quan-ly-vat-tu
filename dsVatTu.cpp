@@ -272,6 +272,7 @@ void ShowVt(vat_tu vt, int pos) {
 
 //---------- in thong tin vat tu tren 1 trang ---------
 void ShowListVtOnePage(Vt_Node root, int StartIndex, int CurVtPage, int TotalVtPage) { 
+	if (StartIndex < 0) StartIndex = 0;
 	// Khai bao 1 mang dong
 	Vt_Node* VtNodeList = new Vt_Node[Max_itemVt];
 	int index = 0;
@@ -505,10 +506,6 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 				return;
 			}
 			checked = FindVtNode(root, vt_ma);
-			if (vt_ma == "") {
-				Notification("Ma vat tu khong duoc phep trong!");
-				break;
-			}
 			//Kiem tra trong truong hop nhap
 			if (checked != NULL) {
 				Notification("Ma vat tu da ton tai!");
@@ -528,10 +525,6 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 			if (cur_step != step) {
 				break;
 			}
-			if (vt_ten == "") {
-				Notification("Ten vat tu khong duoc phep rong!");
-				break;
-			}
 			step++;
 			break;
 		case 3: //nhap don vi tinh
@@ -544,10 +537,6 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 			if (cur_step != step) {
 				break;
 			}
-			if (vt_dvt == "") {
-				Notification("Don vi tinh khong duoc phep rong!");
-				break;
-			}
 			step++;
 			break;
 		case 4: //nhap so luong ton
@@ -556,7 +545,7 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 				break;
 			}
 			cur_step = step;
-			TypeOnlyNumber(vt_slton, step, Edited, Saved, 1000000, 5);
+			TypeOnlyNumber(vt_slton, step, Edited, Saved, 5, 5);
 			if (!Saved) {
 				RemoveFormComplete(4);
 				return;
@@ -564,10 +553,6 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 			if (cur_step != step) {
 				break;
 			}
-			if (vt_slton == 0) {
-				Notification("So luong ton phai >= 1!");
-				break;
-			} 
 			step++;
 			break;
 		case 5: //tien hanh nhap hoac chinh sua vat tu
@@ -614,8 +599,8 @@ void MenuManageVT(Vt_Node& root) {
 	ShowCur(0);
 	system("cls");
 
-	int CurVtPage = 1;
 	int TotalVtPage = (int)ceil((double)CountVtNode(root) / NumberPerPage);
+	int CurVtPage = (TotalVtPage != 0);
 	Display(ContentVT, sizeof(ContentVT) / sizeof(string), true);
 	ShowListVtOnePage(root, (CurVtPage - 1) * NumberPerPage, CurVtPage, TotalVtPage);
 	gotoxy(X_Title, Y_Title);
@@ -670,6 +655,7 @@ void MenuManageVT(Vt_Node& root) {
 
 //---------- in thong tin nhan vien tren 1 trang ---------
 void ShowListVtOnePageAscending(Vt_Node ds[], int StartIndex, int sl, int CurVtPageAscending, int TotalVtPageAscending) {
+	if (StartIndex < 0) StartIndex = 0;
 	gotoxy(X_DisplayNum, Y_DisplayNum);
 	cout << "So luong vat tu: " << sl;
 	int i;
@@ -737,8 +723,8 @@ void PrintListVT(Vt_Node root) {
 	int temp_sl = 0;
 	UpdateArrVtList(root, temp_ds, temp_sl);
 
-	int CurVtPageAscending = 1;
 	int TotalVtPageAscending = (int)ceil((double)temp_sl / NumberPerPage);
+	int CurVtPageAscending = (TotalVtPageAscending != 0);
 
 	/*for (int i = 0; i < temp_sl; i++) {
 		for (int j = i + 1; j < temp_sl; j++) {

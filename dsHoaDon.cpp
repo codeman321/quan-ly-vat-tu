@@ -67,7 +67,7 @@ void AddLastListHD(ds_hoa_don*& dshd, hoa_don hd) {
 	dshd->n_hd++;
 }
 
-//--------- toa bang nhap hoa don ------------
+//--------- tao bang nhap hoa don ------------
 void InputFormHD(string ct[], int sl, int length) {
 		gotoxy(X_Title + 65, Y_Title);
 		cout << " Lap hoa don ";
@@ -120,7 +120,7 @@ hd_Node* FindSoHDExist(ds_hoa_don* dshd, string ID) {
 }
 
 //----------- tinh tri gia -------------
-int ComputeValue(int sl, double donGia, double VAT) {
+double ComputeValue(int sl, double donGia, double VAT) {
 	return (sl * donGia) + ((sl * donGia) * VAT / 100);
 }
 
@@ -310,6 +310,7 @@ void ShowCTHD(cthd_Node* cthd_temp, Vt_Node root, int pos) {
 
 //--------- in danh sach chi tiet hoa don trong 1 trang ----------
 void ShowListCTHDOnePage(hd_Node* temp, Vt_Node root, int StartIndex, int CurHDPage, int TotalHDPage) {
+	if (StartIndex < 0) StartIndex = 0;
 	int sl = temp->data.dscthd->n_cthd;
 	gotoxy(X_DisplayNum + 18, Y_DisplayNum);
 	cout << "      ";
@@ -357,6 +358,7 @@ void ShowCTHDWithValue(cthd_Node* cthd_temp, Vt_Node root, int pos) {
 
 //--------- in danh sach chi tiet hoa don trong 1 trang voi tri gia ----------
 void ShowListCTHDOnePageWithValue(hd_Node* temp, Vt_Node root, int StartIndex, int CurCTHDPage, int TotalCTHDPage) {
+	if (StartIndex < 0) StartIndex = 0;
 	int sl = temp->data.dscthd->n_cthd;
 	gotoxy(X_DisplayNum + 18, Y_DisplayNum);
 	cout << "      ";
@@ -490,6 +492,7 @@ void ShowHD(hoa_don hd, int pos) {
 
 //------------ in cac hoa don trong 1 trang ---------
 void ShowListHDOnePage(ds_hoa_don* dshd, int index, int CurHDPage, int TotalHDPage) {
+	if (index < 0) index = 0;
 	gotoxy(xKeyContentHD[0] + 20, Y_DisplayNum);
 	cout << "         ";
 	gotoxy(xKeyContentHD[0], Y_DisplayNum);
@@ -528,7 +531,8 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 	hd_Node* temp = dshd->head;
 
 	for (int i = 0; i < sl; i++) {
-		dshdNode[i] = temp;
+		dshdNode[i] = new hd_Node;
+		dshdNode[i]->data = temp->data;
 		temp = temp->next;
 	}
 	//truong hop khong co hoa don nao
@@ -544,8 +548,8 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 
 	//--------highlight dong dang chon--------
 	int lower_bound = (CurHDPage - 1) * NumberPerPage;
-	int pick = lower_bound;
-	int index = 0;
+	int pick = lower_bound; //chi so cua phan tu do
+	int index = 0; //vi tri cua phan tu trong bang
 	int upper_bound = CurHDPage * NumberPerPage;
 	HighlightLine2();
 	HighLightArrow(115, Y_Display + 4 + index * 4);
@@ -593,6 +597,8 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 				pick = lower_bound;
 				NormalLine();
 				
+				ShowListHDOnePage(dshd, (CurHDPage - 1) * NumberPerPage, CurHDPage, TotalHDPage);
+
 				HighlightLine2();
 				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
@@ -608,18 +614,25 @@ hd_Node* PickHD(ds_hoa_don* dshd, int CurHDPage, int TotalHDPage) {
 				pick = lower_bound;
 				NormalLine();
 				
+				ShowListHDOnePage(dshd, (CurHDPage - 1) * NumberPerPage, CurHDPage, TotalHDPage);
+
 				HighlightLine2();
 				HighLightArrow(115, Y_Display + 4 + index * 4);
 				ShowHD(dshdNode[pick]->data, index);
 			}
 			break;
-		case ENTER:
+		case ENTER: {
 			NormalLine();
 			DeleteArrow(115, Y_Display + 4 + index * 4);
 			return dshdNode[pick]; //luu lua chon de thuc hien chuc nang ham Menu
+		}
 		case ESC:
 			NormalLine();
 			DeleteArrow(115, Y_Display + 4 + index * 4);
+			for (int i = 0; i < sl; i++) {
+				delete dshdNode[i];
+			}
+			delete[] dshdNode;
 			return NULL;
 		}
 	}

@@ -25,6 +25,7 @@ void DeleteNotification();
 void Display(string ct[], int sl, bool used);
 void DisplayForWatch(string ct[], int num_row, int num_item);
 void RemoveExceedMember(int cnt, int sl);
+void RemoveExceedMemberTK(int cnt, int sl);
 void CreateInputForm(string ct[], int sl, int length);
 void DrawBorderFuncNV(int x, int y, int length, int height);
 int PrintOrUpdate(int index);

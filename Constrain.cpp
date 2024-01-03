@@ -34,6 +34,14 @@ void TypeOnlyAWord(string& result, int& step, bool Edited, bool& Saved, int Limi
 					}
 				}
 				else if (event == ENTER) {
+					if (result == "") {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "                     ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					return;
 				}
 				else if (event == ESC) {
@@ -90,6 +98,14 @@ void TypeWordAndSpace(string& result, int& step, bool Edited, bool& Saved, int L
 					}
 				}
 				else if (event == ENTER) {
+					if (result == "") {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "                     ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					if (result != "" && result[result.length() - 1] == ' ') {
 						result = result.substr(0, result.length() - 1);
 					}
@@ -133,7 +149,7 @@ void TypeOnlyNumber(int& result, int& step, bool Edited, bool& Saved, int Limit_
 				}
 				else if (isdigit(char(event))) {
 					int num = event - 48;
-					if ((result * 10 + num) <= Limit_number) {
+					if (cnt <= Limit_number) {
 						cout << num;
 						result = result * 10 + num;
 						cnt++;
@@ -145,6 +161,14 @@ void TypeOnlyNumber(int& result, int& step, bool Edited, bool& Saved, int Limit_
 					cnt--;
 				}
 				else if (event == ENTER) {
+					if (result == 0) {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "                        ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					return;
 				}
 				else if (event == ESC) {
@@ -183,6 +207,14 @@ void TypeWordAndNumber(string& result, int& step, bool Edited, bool& Saved, int 
 					}
 				}
 				else if (event == ENTER) {
+					if (result == "") {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "                     ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					return;
 				}
 				else if (event == ESC) {
@@ -210,8 +242,10 @@ void TypeDate(int& result, int& step, bool& Saved, int LimitReach, int distance,
 	int number = result;
 	gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
 	if (result != 0) {
-		if (result <= 9)
+		if (result <= 9) {
 			cout << "0";
+			cnt++;
+		}
 		cout << result;
 	}
 	int num = result;
@@ -233,7 +267,7 @@ void TypeDate(int& result, int& step, bool& Saved, int LimitReach, int distance,
 				}
 				else if (48 <= signal && signal <= 57) {
 					int numb = signal - 48;
-					/*vi nhu nhap 13 la gio thi khong hop le*/
+					/*vi nhu nhap 13 la thang thi khong hop le*/
 					if (result > LimitReach) {
 						continue;
 					}
@@ -254,8 +288,14 @@ void TypeDate(int& result, int& step, bool& Saved, int LimitReach, int distance,
 					return;
 				}
 				else if (signal == ENTER) {
-					if (result > LimitReach || result == 0 || min >= result || result >= max)
-						continue;
+					if (result > LimitReach || result == 0 || min >= result || result >= max) {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "    ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					if (result >= 1 && result <= 9) {
 						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
 						cout << "0" << result;
@@ -329,6 +369,14 @@ void TypeDoubleNumber(double& result, int &step, bool& Saved, double Limit_numbe
 					decimalPointEntered = true;
 				}
 				else if (event == ENTER) {
+					if (result == 0) {
+						Notification("Thong tin khong hop le, vui long nhap lai!");
+						cnt = 0;
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						cout << "                     ";
+						gotoxy(X_Add + distance, Y_Add + (step - 1) * 4);
+						break;
+					}
 					return;
 				}
 				else if (event == ESC) {
