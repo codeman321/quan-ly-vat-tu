@@ -294,7 +294,6 @@ void ShowListVtOnePage(Vt_Node root, int StartIndex, int CurVtPage, int TotalVtP
 
 	//Giai phong bo nho
 	delete[] VtNodeList;
-
 }
 
 //---------- thay doi trang in vat tu ----------
@@ -529,7 +528,7 @@ void InputVt(Vt_Node& root, bool Edited, bool Deleted, int& CurVtPage, int& Tota
 			break;
 		case 3: //nhap don vi tinh
 			cur_step = step;
-			TypeWordAndNumber(vt_dvt, step, Edited, Saved, 10, 5);
+			TypeWordNumberAndSpace(vt_dvt, step, Edited, Saved, 10, 5);
 			if (!Saved) {
 				RemoveFormComplete(4);
 				return;

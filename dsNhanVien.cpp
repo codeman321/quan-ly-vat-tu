@@ -396,6 +396,10 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 			if (cur_step != step) {
 				break;
 			}
+			if (!Saved) {
+				RemoveFormComplete(3);
+				return;
+			}
 			for (int i = ho_ten.length() - 1; i >= 0; i--) {
 				if (ho_ten[i] == ' ') {
 					temp = i;
@@ -411,6 +415,10 @@ void inputNV(dsNV& ds, bool Edited, bool Deleted, int& CurNVPage, int& TotalNVPa
 			TypeOnlyAWord(nv_phai, step, Edited, Saved, 5, 5);
 			if (cur_step != step) {
 				break;
+			}
+			if (!Saved) {
+				RemoveFormComplete(3);
+				return;
 			}
 			step++;
 			break;
@@ -477,6 +485,7 @@ void MenuManageNV(dsNV& ds) {
 			if (event == 224) {
 				event = _getch();//lay cac ki tu dac biet
 				if (event == PAGE_UP && CurNVPage > 1) {
+					TotalNVPage = (int)ceil((double)ds.n_nv / NumberPerPage);
 					CurNVPage--;
 					ChangeNVManagerPage(ds, CurNVPage, TotalNVPage);
 				}
@@ -563,6 +572,9 @@ int InputHD(nhan_vien*& nv) {
 			if (cur_step != step) {
 				break;
 			}
+			if (!Saved) {
+				return 0;
+			}
 			step++;
 			break;
 		case 3: { //Nhap thang lap hoa don
@@ -572,6 +584,9 @@ int InputHD(nhan_vien*& nv) {
 			if (cur_step != temp) {
 				step--;
 				break;
+			}
+			if (!Saved) {
+				return 0;
 			}
 			step++;
 			break;
@@ -588,11 +603,16 @@ int InputHD(nhan_vien*& nv) {
 				step = 2;
 				break;
 			}
+			if (!Saved) {
+				return 0;
+			}
 			step++;
 			break;
 		}
 		case 5: {//Nhap loai hoa don
-			(PickHDType() == 1) ? hd.loai = 'N' : hd.loai = 'X';
+			int pick = PickHDType();
+			if (!pick) return 0;
+			(pick == 1) ? hd.loai = 'N' : hd.loai = 'X';
 			step++;
 			break;
 		}
@@ -657,6 +677,9 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 			if (cur_step != step) {
 				break;
 			}
+			if (!Saved) {
+				return 0;
+			}
 			if (cthd.donGia == 0) {
 				Notification("Don gia khong duoc rong!");
 				break;
@@ -669,6 +692,9 @@ int InputCTHD(Vt_Node& root, nhan_vien*& nv, Vt_Node vt, hd_Node* temp) {
 			TypeDoubleNumber(cthd.VAT, step, Saved, 1000000.0, 5);
 			if (cur_step != step) {
 				break;
+			}
+			if (!Saved) {
+				return 0;
 			}
 			if (cthd.VAT == 0) {
 				Notification("%VAT khong duoc rong!");
@@ -1037,18 +1063,27 @@ void ThongKeHD(dsNV ds) {
 			CurX = wherex();
 			gotoxy(CurX + 1, 3);
 			TypeDate(ngay1.thang, stepy, Saved, 13, -90, 0, 13);
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		case 3: {
 			CurX = wherex();
 			gotoxy(CurX + 1, 3);
 			TypeDate(ngay1.nam, stepy, Saved, 2100, -84, 1000, 2100);
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
 		case 4: {
 			gotoxy(75, 3);
 			TypeDate(ngay2.ngay, stepy, Saved, 32, -69, 0, 32);
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1056,6 +1091,9 @@ void ThongKeHD(dsNV ds) {
 			CurX = wherex();
 			gotoxy(CurX + 1, 3);
 			TypeDate(ngay2.thang, stepy, Saved, 13, -63, 0, 13);
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1063,6 +1101,9 @@ void ThongKeHD(dsNV ds) {
 			CurX = wherex();
 			gotoxy(CurX + 1, 3);
 			TypeDate(ngay2.nam, stepy, Saved, 2100, -57, 1000, 2100);
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1139,6 +1180,9 @@ void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 				step--;
 				break;
 			}
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1149,6 +1193,9 @@ void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 			if (cur_step != temp) {
 				step--;
 				break;
+			}
+			if (!Saved) {
+				return;
 			}
 			if (!CheckValidDate(date1, step - 2)) {
 				step = 1;
@@ -1164,6 +1211,9 @@ void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 			if (cur_step != temp) {
 				break;
 			}
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1175,6 +1225,9 @@ void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 				step--;
 				break;
 			}
+			if (!Saved) {
+				return;
+			}
 			step++;
 			break;
 		}
@@ -1185,6 +1238,9 @@ void InputDateForTopRevenue(date& date1, date& date2, bool& Saved) {
 			if (cur_step != temp) {
 				step--;
 				break;
+			}
+			if (!Saved) {
+				return;
 			}
 			if (!CheckValidDate(date2, step - 4)) {
 				step = 4;
@@ -1211,7 +1267,7 @@ void DisplayTopRevenue(dsNV ds, Vt_Node root) {
 		return;
 	}
 
-	cthd_with_val** TopRevenue = new cthd_with_val*[Max_itemVt];
+	cthd_with_val* TopRevenue = new cthd_with_val[Max_itemVt];
 	int idx = 0;
 	for (int i = 0; i < ds.n_nv; i++) {
 		hd_Node* hd_temp = ds.dsnv[i]->dshd->head;
@@ -1221,16 +1277,15 @@ void DisplayTopRevenue(dsNV ds, Vt_Node root) {
 				for (int k = 0; k < hd_temp->data.dscthd->n_cthd; k++) {
 					bool found = false;
 					for (int m = 0; m < idx; m++) {
-						if (TopRevenue[m]->cthd->maVT == cthd_temp->data.maVT) {
-							TopRevenue[m]->revenue += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+						if (TopRevenue[m].cthd.maVT == cthd_temp->data.maVT) {
+							TopRevenue[m].revenue += ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
 							found = true;
 							break;
 						}
 					}
 					if (!found) {
-						TopRevenue[idx] = new cthd_with_val;
-						TopRevenue[idx]->cthd = &cthd_temp->data;
-						TopRevenue[idx]->revenue = ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
+						TopRevenue[idx].cthd = cthd_temp->data;
+						TopRevenue[idx].revenue = ComputeValue(cthd_temp->data.sl, cthd_temp->data.donGia, cthd_temp->data.VAT);
 						idx++;
 					}
 					cthd_temp = cthd_temp->next;
@@ -1241,22 +1296,24 @@ void DisplayTopRevenue(dsNV ds, Vt_Node root) {
 	}
 	for (int i = 0; i < idx; i++) {
 		for (int j = i + 1; j < idx; j++) {
-			if (TopRevenue[i]->revenue < TopRevenue[j]->revenue) {
-				cthd_with_val* temp = TopRevenue[i];
+			if (TopRevenue[i].revenue < TopRevenue[j].revenue) {
+				cthd_with_val temp = TopRevenue[i];
 				TopRevenue[i] = TopRevenue[j];
 				TopRevenue[j] = temp;
 			}
 		}
 	}
 
+	
+
 	for (int i = 0; i < 10 && i < idx; i++) {
-		Vt_Node vt = FindVtNode(root, TopRevenue[i]->cthd->maVT);
+		Vt_Node vt = FindVtNode(root, TopRevenue[i].cthd.maVT);
 		gotoxy(xKeyContentNV[1] + 5, 12 + i * 4);
-		cout << TopRevenue[i]->cthd->maVT;
+		cout << TopRevenue[i].cthd.maVT;
 		gotoxy(xKeyContentNV[2] + 5, 12 + i * 4);
 		cout << vt->data.ten_vt;
 		gotoxy(xKeyContentNV[3] + 2, 12 + i * 4);
-		cout << addDot(TopRevenue[i]->revenue);
+		cout << addDot(TopRevenue[i].revenue);
 	}
 	
 	int signal = 0;
@@ -1264,9 +1321,6 @@ void DisplayTopRevenue(dsNV ds, Vt_Node root) {
 		while (_kbhit()) {
 			signal = _getch();
 			if (signal == ESC) {
-				for (int i = 0; i < idx; ++i) {
-					delete TopRevenue[i];
-				}
 				delete[] TopRevenue;
 				return;
 			}
@@ -1296,7 +1350,7 @@ void DisplayStatisticRevenue(dsNV ds) {
 	gotoxy(X_Display + 68, Y_Display - 3);
 	cout << year;
 
-	int TotalRevenueList[13] = {0};
+	double TotalRevenueList[13] = {0};
 	for (int i = 0; i < ds.n_nv; i++) {
 		hd_Node* hd_temp = ds.dsnv[i]->dshd->head;
 		for (int j = 0; j < ds.dsnv[i]->dshd->n_hd; j++) {

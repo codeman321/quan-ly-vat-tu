@@ -165,7 +165,14 @@ int PickHDType() {
 		case ENTER:
 			NormalLine();
 			return pointer;
+			
+
+		case ESC:
+			NormalLine();
+			return 0;
 		}
+
+		
 	}
 }
 
